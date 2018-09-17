@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PocketFinances</string>
+    <string name="hello_world_str">Hello World!</string>
 </resources>
