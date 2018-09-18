@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,15 +16,19 @@
         android:scaleType="centerCrop"/>
 
     <TextView
-        android:id="@+id/textViewNum"
+        android:id="@+id/homescreen_title_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@id/text_view"
+        android:text="@string/pocket_finances"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toTopOf="@id/homescreen_info_textview"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <TextView
-        android:id="@+id/text_view"
+        android:id="@+id/homescreen_info_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="This is the main activity / entry point for the application.  The home page should go here."
@@ -34,5 +39,33 @@
         android:textSize="20sp"
         android:padding="30dp"
         android:textColor="#ffffff"/>
+
+</android.support.constraint.ConstraintLayout>
+-->
+
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background_main"
+        android:scaleType="centerCrop"/>
+
+    <FrameLayout
+        android:id="@+id/activity_main_framelayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Fragments are inflated here. -->
+
+    </FrameLayout>
+
+
 
 </android.support.constraint.ConstraintLayout>

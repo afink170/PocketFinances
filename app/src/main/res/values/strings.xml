@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">PocketFinances</string>
-    <string name="hello_world_str">Hello World!</string>
+    <string name="pocket_finances">POCKET FINANCES</string>
+    <string name="font_walkway_black">fonts/Walkway_Black.ttf</string>
 </resources>
