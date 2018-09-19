@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 // Class defining the logic for the Home Fragment.
@@ -19,7 +20,8 @@ public class HomeFragment extends Fragment {
     Typeface FONT_WALKWAY;
 
     // Declare UI elements
-    TextView textView1, textView2, textView3, balanceTextView, budgetTextView;
+    TextView textView1, textView2, textView3, titleTextView, balanceTextView, budgetTextView, btnCaptionTextView;
+    ImageButton addExpenseBtn;
 
     /*
     public HomeFragment() {
@@ -33,17 +35,15 @@ public class HomeFragment extends Fragment {
         // Inflate fragment from fragment_home XML
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        try {
-            // Initialize UI elements
-            textView1 = view.findViewById(R.id.fragment_home_textview1);
-            textView2 = view.findViewById(R.id.fragment_home_textview2);
-            textView3 = view.findViewById(R.id.fragment_home_textview3);
-            balanceTextView = view.findViewById(R.id.fragment_home_balance_textview);
-            budgetTextView = view.findViewById(R.id.fragment_home_budget_textview);
-        }
-        catch (Exception e) {
-            Log.e(TAG, "Unable to initialize UI elements.", e);
-        }
+        // Initialize UI elements
+        textView1 = view.findViewById(R.id.fragment_home_textview1);
+        textView2 = view.findViewById(R.id.fragment_home_textview2);
+        textView3 = view.findViewById(R.id.fragment_home_textview3);
+        titleTextView = view.findViewById(R.id.fragment_home_title_textview);
+        balanceTextView = view.findViewById(R.id.fragment_home_balance_textview);
+        budgetTextView = view.findViewById(R.id.fragment_home_budget_textview);
+        addExpenseBtn = view.findViewById(R.id.fragment_home_addexpense_btn);
+        btnCaptionTextView = view.findViewById(R.id.fragment_home_addexpense_caption);
 
 
         try {
@@ -54,8 +54,10 @@ public class HomeFragment extends Fragment {
             textView1.setTypeface(FONT_WALKWAY);
             textView2.setTypeface(FONT_WALKWAY);
             textView3.setTypeface(FONT_WALKWAY);
+            titleTextView.setTypeface(FONT_WALKWAY);
             balanceTextView.setTypeface(FONT_WALKWAY);
             budgetTextView.setTypeface(FONT_WALKWAY);
+            btnCaptionTextView.setTypeface(FONT_WALKWAY);
         }
         catch (Exception e) {
             Log.e(TAG, "Unable to set font of application text.", e);
@@ -63,6 +65,17 @@ public class HomeFragment extends Fragment {
 
 
 
+        setListeners();
+
         return view;
+    }
+
+    private void setListeners() {
+        addExpenseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Launch add new expense
+            }
+        });
     }
 }
