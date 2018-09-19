@@ -9,6 +9,7 @@
 
         <item name="android:windowTranslucentStatus" tools:targetAPI="19">true</item>
         <item name="android:windowTranslucentNavigation" tools:targetAPI="19">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds" tools:targetAPI="21">false</item>
     </style>
 
 </resources>

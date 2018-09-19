@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_nav_home"
+        android:title="Home"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/nav_accounts"
+        android:icon="@drawable/ic_nav_bank"
+        android:title="Bank Accounts"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/nav_subscriptions"
+        android:icon="@drawable/ic_nav_credit_cards_payment"
+        android:title="Subscriptions"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/nav_budget"
+        android:icon="@drawable/ic_nav_notepad"
+        android:title="Budget"
+        app:showAsAction="ifRoom"/>
+
+</menu>
