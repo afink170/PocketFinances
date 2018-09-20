@@ -26,8 +26,8 @@ import android.widget.FrameLayout;
 // Will load most fragments from here.
 public class MainActivity extends AppCompatActivity {
 
-    private static String TAG = "MainActivity";
-    private static int BOTTOM_NAV_HEIGHT_DP = 60;
+    private static final String TAG = "MainActivity";
+    private static final int BOTTOM_NAV_HEIGHT_DP = 60;
 
     // Declare UI elements
     FragmentTransaction fragmentTransaction;
@@ -70,15 +70,24 @@ public class MainActivity extends AppCompatActivity {
         bottomNavView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
                 switch (item.getItemId()) {
                     case R.id.nav_home:
                         if (R.id.nav_home != activeFragmentId) {
-                            // Launch new fragment
+                            fragmentTransaction
+                                    .replace(fragmentHolder.getId(), new HomeFragment())
+                                    .commit();
+                            activeFragmentId = R.id.nav_home;
                         }
                         return true;
                     case R.id.nav_accounts:
                         if (R.id.nav_accounts != activeFragmentId) {
-                            // Launch new fragment
+                            fragmentTransaction
+                                    .replace(fragmentHolder.getId(), new AccountsFragment())
+                                    .commit();
+                            activeFragmentId = R.id.nav_accounts;
                         }
                         return true;
                     case R.id.nav_subscriptions:
@@ -98,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    // TODO:  Need to fix this so that it doesn't throw ClassCastException.
     private void setNavMenuPadding() {
         Log.v(TAG, "Checking for soft keys.");
         try {
