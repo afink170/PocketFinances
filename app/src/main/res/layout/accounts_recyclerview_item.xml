@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/border_bottom"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/accounts_recyclerview_textview_accountname"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:paddingTop="4dp"
+        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
+        android:paddingRight="0dp"
+        android:paddingEnd="0dp"
+        android:textSize="20sp"
+        android:text="Bank Account"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/accounts_recyclerview_textview_bankname"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
+        android:paddingRight="0dp"
+        android:paddingEnd="0dp"
+        android:text="Bank Name"
+        app:layout_constraintTop_toBottomOf="@id/accounts_recyclerview_textview_accountname"/>
+
+    <TextView
+        android:id="@+id/accounts_recyclerview_textview_accountbalance"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:textSize="20sp"
+        android:paddingLeft="0dp"
+        android:paddingStart="0dp"
+        android:paddingRight="4dp"
+        android:paddingEnd="4dp"
+        android:text="$1000.03"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+
+</android.support.constraint.ConstraintLayout>

@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentHolder = findViewById(R.id.activity_main_framelayout);
         bottomNavView = findViewById(R.id.bottom_nav_view);
 
+        // BROKEN
         // Make phone status bar transparent if API level >= KitKat (19)
         /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
                         if (R.id.nav_accounts != activeFragmentId) {
                             fragmentTransaction
                                     .replace(fragmentHolder.getId(), new AccountsFragment())
+                                    .addToBackStack(null)
                                     .commit();
                             activeFragmentId = R.id.nav_accounts;
                         }

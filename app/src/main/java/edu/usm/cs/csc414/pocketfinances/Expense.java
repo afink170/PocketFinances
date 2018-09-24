@@ -1,57 +1,65 @@
 package edu.usm.cs.csc414.pocketfinances;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
+
 import java.util.Date;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "Expense",
+        indices = @Index(value = "account_id"),
+        foreignKeys = @ForeignKey(
+        entity = BankAccount.class,
+        parentColumns = "account_id",
+        childColumns = "account_id",
+        onDelete = CASCADE))
+
 public class Expense {
-
-    // Different categories of expenses
-    public static final String CATEGORY_SHOPPING = "Shopping";
-    public static final String CATEGORY_DINING = "Dining";
-    public static final String CATEGORY_AUTO = "Auto";
-    public static final String CATEGORY_GROCERIES = "Groceries";
-    public static final String CATEGORY_SAVINGS = "Savings";
-    public static final String CATEGORY_TRAVEL = "Travel";
-    public static final String CATEGORY_UTILITIES = "Utilities";
-    public static final String CATEGORY_HOUSEHOLD = "Household";
-    public static final String CATEGORY_ENTERTAINMENT = "Entertainment";
-    public static final String CATEGORY_SALARY = "Salary";
-    public static final String CATEGORY_DEPOSIT = "Deposit";
-    public static final String CATEGORY_CREDIT_CARD_PAYMENT = "Credit Card Payment";
-    public static final String CATEGORY_GIFTS = "Gifts";
-    public static final String CATEGORY_HEALTH_FITNESS = "Health & Fitness";
-    public static final String CATEGORY_RENT = "Rent";
-    public static final String CATEGORY_TAX= "Tax";
-    public static final String CATEGORY_OTHER = "Other";
-
-    // Different options for recurring payments
-    public static final String RECURRENCE_DAILY = "daily";
-    public static final String RECURRENCE_WEEKLY = "weekly";
-    public static final String RECURRENCE_BIWEEKLY = "biweekly";
-    public static final String RECURRENCE_MONTHLY = "monthly";
-    public static final String RECURRENCE_3MONTHS = "3months";
-    public static final String RECURRENCE_6MONTHS = "6months";
-    public static final String RECURRENCE_YEARLY = "yearly";
 
     public static final int DEPOSIT = 1;
     public static final int DEDUCT = -1;
 
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name="expense_id")
+    private int expenseId;
 
+    @ColumnInfo(name="account_id")
     private int accountId; //Foreign Key
-    private int expenseId; // Primary Key
+
+    @ColumnInfo(name="title")
     private String title;
-    private String category;
+
+    @TypeConverters(CategoryConverter.class)
+    @ColumnInfo(name="category")
+    private ExpenseCategory category;
+
+    @ColumnInfo(name="amount")
     private double amount;
+
+    @TypeConverters(DateConverter.class)
+    @ColumnInfo(name="date")
     private Date date;
+
+    @ColumnInfo(name="deposit_or_deduct")
     private int depositOrDeduct;
+
+    @ColumnInfo(name="is_recurring")
     private boolean isRecurring;
-    private String recurrenceRate;
+
+    @TypeConverters(RecurrenceRateConverter.class)
+    @ColumnInfo(name="recurrence_rate")
+    private RecurrenceRate recurrenceRate;
 
 
 
 
-    public Expense(int accountId, int expenseId, String title, String category, double amount, Date date, int depositOrDeduct, boolean isRecurring, String recurrenceRate) {
+    public Expense(int accountId, String title, ExpenseCategory category, double amount, Date date, int depositOrDeduct, boolean isRecurring, RecurrenceRate recurrenceRate) {
         this.accountId = accountId;
-        this.expenseId = expenseId;
         this.title = title;
         this.category = category;
         this.amount = amount;
@@ -60,6 +68,17 @@ public class Expense {
         this.isRecurring = isRecurring;
         this.recurrenceRate = recurrenceRate;
     }
+
+
+    public int getExpenseId() {
+        return expenseId;
+    }
+
+    public void setExpenseId(int expenseId) {
+        this.expenseId = expenseId;
+    }
+
+
 
     public int getAccountId() {
         return accountId;
@@ -77,11 +96,11 @@ public class Expense {
         this.title = title;
     }
 
-    public String getCategory() {
+    public ExpenseCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ExpenseCategory category) {
         this.category = category;
     }
 
@@ -117,11 +136,11 @@ public class Expense {
         isRecurring = recurring;
     }
 
-    public String getRecurrenceRate() {
+    public RecurrenceRate getRecurrenceRate() {
         return recurrenceRate;
     }
 
-    public void setRecurrenceRate(String recurrenceRate) {
+    public void setRecurrenceRate(RecurrenceRate recurrenceRate) {
         this.recurrenceRate = recurrenceRate;
     }
 }

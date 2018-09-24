@@ -1,22 +1,37 @@
 package edu.usm.cs.csc414.pocketfinances;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
+@Entity(tableName = "BankAccount")
 public class BankAccount {
 
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name="account_id")
     private int accountId;
+
+    @ColumnInfo(name="bank_name")
     private String bankName;
+
+    @ColumnInfo(name="account_name")
     private String accountName;
+
+    @ColumnInfo(name="account_type")
     private String accountType;
-    private String accountBalance;
+
+    @ColumnInfo(name="account_balance")
+    private double accountBalance;
 
 
-    public BankAccount(int accountId, String bankName, String accountName, String accountType, String accountBalance) {
-        this.accountId = accountId;
+    public BankAccount(String bankName, String accountName, String accountType, double accountBalance) {
         this.bankName = bankName;
         this.accountName = accountName;
         this.accountType = accountType;
         this.accountBalance = accountBalance;
     }
 
+    public void setAccountId(int accountId) { this.accountId = accountId; }
 
     public int getAccountId() {
         return accountId;
@@ -46,11 +61,11 @@ public class BankAccount {
         this.accountType = accountType;
     }
 
-    public String getAccountBalance() {
+    public double getAccountBalance() {
         return accountBalance;
     }
 
-    public void setAccountBalance(String accountBalance) {
+    public void setAccountBalance(double accountBalance) {
         this.accountBalance = accountBalance;
     }
 }
