@@ -23,4 +23,10 @@ public interface BankAccountDao {
 
     @Query("SELECT * FROM BankAccount ORDER BY account_id")
     LiveData<List<BankAccount>> getAllBankAccounts();
+
+    @Query("SELECT * FROM BankAccount WHERE account_id=:accountId")
+    LiveData<BankAccount> getBankAccount(int accountId);
+
+    @Query("UPDATE BankAccount SET account_balance = account_balance + :balance WHERE account_id = :accountId")
+    void updateBalance(int accountId, double balance);
 }

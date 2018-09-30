@@ -45,6 +45,15 @@ public enum RecurrenceRate {
         return null;
     }
 
+    public static RecurrenceRate getRateFromText(String text) {
+        for(RecurrenceRate rate : values()){
+            if( rate.getText() == text){
+                return rate;
+            }
+        }
+        return null;
+    }
+
 
     public Integer getValue(){
         return value;

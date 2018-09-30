@@ -1,6 +1,8 @@
 package edu.usm.cs.csc414.pocketfinances;
 
-import android.graphics.Typeface;
+import android.arch.lifecycle.Observer;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,16 +14,22 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 // Class defining the logic for the Home Fragment.
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
 
-    // Declare Typeface for custom font
-    Typeface FONT_WALKWAY;
-
     // Declare UI elements
     TextView textView1, textView2, textView3, titleTextView, balanceTextView, budgetTextView, btnCaptionTextView;
     ImageButton addExpenseBtn, settingsBtn;
+
+    SharedPreferences sharedPreferences;
+    private static final String SHARED_PREFS = "shared_prefs";
+    private static final String PREFS_DEFAULT_ACCOUNT = "default_account";
+    private static final String PREFS_DEFAULT_IS_ALL_ACOUNTS = "default_is_all";
+    int defaultAccountId;
+    boolean defaultIsAllAccounts = true;
 
 
 
@@ -33,6 +41,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         try {
+
             // Initialize UI elements
             textView1 = view.findViewById(R.id.fragment_home_textview1);
             textView2 = view.findViewById(R.id.fragment_home_textview2);
@@ -49,23 +58,15 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "HomeFragment's UI elements successfully initialized.");
 
 
-        try {
-            // Initialize custom font from resource
-            FONT_WALKWAY = Typeface.createFromAsset(getActivity().getAssets(), getString(R.string.font_walkway_black));
+        sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        defaultAccountId = sharedPreferences.getInt(PREFS_DEFAULT_ACCOUNT, -1);
 
-            // Set the font for UI elements to custom font
-            textView1.setTypeface(FONT_WALKWAY);
-            textView2.setTypeface(FONT_WALKWAY);
-            textView3.setTypeface(FONT_WALKWAY);
-            titleTextView.setTypeface(FONT_WALKWAY);
-            balanceTextView.setTypeface(FONT_WALKWAY);
-            budgetTextView.setTypeface(FONT_WALKWAY);
-            btnCaptionTextView.setTypeface(FONT_WALKWAY);
+        if (defaultAccountId != -1) {
+            observeAccountBalance();
         }
-        catch (Exception e) {
-            Log.e(TAG, "Unable to set font of application text.", e);
+        else {
+            balanceTextView.setText("$0.00");
         }
-        Log.d(TAG, "Font of UI text successfully set.");
 
         // Set listeners for UI elements, such as OnClick listeners for buttons
         setListeners();
@@ -80,6 +81,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // Launch add new expense
+                NewExpenseDialog newExpenseDialog = new NewExpenseDialog(getActivity(), defaultAccountId);
+                newExpenseDialog.show();
             }
         });
 
@@ -88,6 +91,36 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 // Launch settings activity
             }
+        });
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+                observeAccountBalance();
+            }
+        });
+    }
+
+    public void observeAccountBalance() {
+        BankAccountsViewModel accountsViewModel =  new BankAccountsViewModel(getActivity().getApplication());
+                accountsViewModel.getBankAccount(defaultAccountId).observe(this, new Observer<BankAccount>() {
+            @Override
+            public void onChanged(@Nullable BankAccount bankAccount) {
+                if (bankAccount == null) {
+                    Log.e(TAG, "Failed to get balance of default account.");
+                    return;
+                }
+
+                if (bankAccount.getAccountBalance() < 0.0) {
+                    balanceTextView.setText(String.format(Locale.US, "-$%.2f", Math.abs(bankAccount.getAccountBalance())));
+                    balanceTextView.setTextColor(getResources().getColor(R.color.colorRed));
+                }
+                else {
+                    balanceTextView.setText(String.format(Locale.US, "$%.2f", bankAccount.getAccountBalance()));
+                    balanceTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                }
+            }
+
         });
     }
 }

@@ -65,8 +65,8 @@
                                       <entry key="assetType" value="IMAGE" />
                                       <entry key="cropped" value="true" />
                                       <entry key="iconShape" value="NONE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/icons8-pencil-48.png" />
-                                      <entry key="outputName" value="ic_pencil_48" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/icons8-back-52.png" />
+                                      <entry key="outputName" value="ic_back_48" />
                                     </map>
                                   </option>
                                 </PersistentState>

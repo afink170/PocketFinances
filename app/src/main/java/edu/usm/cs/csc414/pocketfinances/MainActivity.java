@@ -1,6 +1,7 @@
 package edu.usm.cs.csc414.pocketfinances;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Build;
@@ -16,10 +17,8 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-
 
 
 // Entry point activity for application.
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         bottomNavView.setSelectedItemId(R.id.nav_home);
         activeFragmentId = R.id.nav_home;
 
-
         bottomNavView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_home:
                         if (R.id.nav_home != activeFragmentId) {
                             fragmentTransaction
-                                    .replace(fragmentHolder.getId(), new HomeFragment())
+                                    .replace(fragmentHolder.getId(), new HomeFragment(), "HomeFragment")
                                     .commit();
                             activeFragmentId = R.id.nav_home;
                         }
@@ -86,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_accounts:
                         if (R.id.nav_accounts != activeFragmentId) {
                             fragmentTransaction
-                                    .replace(fragmentHolder.getId(), new AccountsFragment())
+                                    .replace(fragmentHolder.getId(), new AccountsFragment(), "AccountsFragment")
                                     .addToBackStack(null)
                                     .commit();
                             activeFragmentId = R.id.nav_accounts;

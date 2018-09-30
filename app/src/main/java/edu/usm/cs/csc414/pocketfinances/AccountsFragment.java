@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -49,9 +50,6 @@ public class AccountsFragment extends Fragment {
         titleText = view.findViewById(R.id.fragment_accounts_title_textview);
         addAccountBtn = view.findViewById(R.id.fragment_accounts_add_btn);
 
-        // set the listeners for any UI elements that need them
-        setListeners();
-
 
         try {
             // Initialize custom font from resource
@@ -79,6 +77,7 @@ public class AccountsFragment extends Fragment {
         // Attach the RecyclerViewAdapter to the RecyclerView
         recyclerView.setAdapter(recyclerViewAdapter);
 
+
         // Initialize the ViewModel
         viewModel = ViewModelProviders.of(this).get(BankAccountsViewModel.class);
 
@@ -92,8 +91,14 @@ public class AccountsFragment extends Fragment {
         });
 
 
+        // set the listeners for any UI elements that need them
+        setListeners();
+
+
         return view;
     }
+
+
 
 
     // Method for setting all the listeners
@@ -155,11 +160,48 @@ public class AccountsFragment extends Fragment {
                 newAccountDialog.show();
             }
         });
+
+
+        recyclerViewAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int itemPosition = recyclerView.getChildLayoutPosition(view);
+                BankAccount clickedAccount = viewModel.getBankAccountsList().getValue().get(itemPosition);
+
+                Bundle bundle = new Bundle();
+                bundle.putInt("activeAccountId", clickedAccount.getAccountId());
+
+                //showToastMessage(clickedAccount.getAccountName() + " clicked!");
+
+                ExpensesFragment expensesFragment = new ExpensesFragment();
+                expensesFragment.setArguments(bundle);
+
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_main_framelayout, expensesFragment)
+                        .commit();
+
+            }
+        });
+
+        recyclerViewAdapter.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                int itemPosition = recyclerView.getChildLayoutPosition(view);
+                BankAccount clickedAccount = viewModel.getBankAccountsList().getValue().get(itemPosition);
+
+                EditDeleteAccountDialog dialog = new EditDeleteAccountDialog(getActivity(), viewModel, clickedAccount);
+                dialog.show();
+
+                return true;
+            }
+        });
     }
 
     private void showToastMessage(String message) {
         Toast.makeText(getActivity().getBaseContext(), message,
-                Toast.LENGTH_SHORT).show();
+                Toast.LENGTH_LONG).show();
     }
+
+
 
 }

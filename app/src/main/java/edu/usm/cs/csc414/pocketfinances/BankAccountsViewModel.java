@@ -22,11 +22,14 @@ public class BankAccountsViewModel extends AndroidViewModel {
         bankAccountsList = financesDatabase.getBankAccountDao().getAllBankAccounts();
     }
 
+    public LiveData<BankAccount> getBankAccount(int accountId) {
+        return financesDatabase.getBankAccountDao().getBankAccount(accountId);
+    }
+
 
     public LiveData<List<BankAccount>> getBankAccountsList() {
         return bankAccountsList;
     }
-
 
     public void deleteItem(BankAccount bankAccount) {
         new deleteAsyncTask(financesDatabase).execute(bankAccount);
@@ -34,6 +37,14 @@ public class BankAccountsViewModel extends AndroidViewModel {
 
     public void insertItem(BankAccount bankAccount) {
         new insertAsyncTask(financesDatabase).execute(bankAccount);
+    }
+
+    public void updateItem(BankAccount bankAccount) {
+        new updateAsyncTask(financesDatabase).execute(bankAccount);
+    }
+
+    public void updateBalance(int accountId, double balanceChange) {
+        new updateBalanceAsyncTask(financesDatabase).execute(Double.longBitsToDouble(accountId), balanceChange);
     }
 
 
@@ -64,6 +75,36 @@ public class BankAccountsViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(BankAccount... accounts) {
             db.getBankAccountDao().insert(accounts);
+            return null;
+        }
+    }
+
+
+    private static class updateAsyncTask extends AsyncTask<BankAccount, Void, Void> {
+        private FinancesDatabase db;
+
+        updateAsyncTask(FinancesDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(BankAccount... accounts) {
+            db.getBankAccountDao().update(accounts);
+            return null;
+        }
+    }
+
+
+    private static class updateBalanceAsyncTask extends AsyncTask<Double, Void, Void> {
+        private FinancesDatabase db;
+
+        updateBalanceAsyncTask(FinancesDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(Double... params) {
+            db.getBankAccountDao().updateBalance((int) Double.doubleToLongBits(params[0]), params[1]);
             return null;
         }
     }

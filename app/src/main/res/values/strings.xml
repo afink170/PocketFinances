@@ -5,4 +5,5 @@
     <string name="add_new_account_contentdescription">Add New Account</string>
     <string name="edit_accounts_contentdescription">Edit Accounts</string>
     <string name="fragment_accounts_title_text">Accounts</string>
+    <string name="add_new_expense_contentdescription">Add New Expense</string>
 </resources>

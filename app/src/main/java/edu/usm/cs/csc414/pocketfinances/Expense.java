@@ -7,6 +7,7 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -43,7 +44,7 @@ public class Expense {
 
     @TypeConverters(DateConverter.class)
     @ColumnInfo(name="date")
-    private Date date;
+    private Calendar date;
 
     @ColumnInfo(name="deposit_or_deduct")
     private int depositOrDeduct;
@@ -58,7 +59,7 @@ public class Expense {
 
 
 
-    public Expense(int accountId, String title, ExpenseCategory category, double amount, Date date, int depositOrDeduct, boolean isRecurring, RecurrenceRate recurrenceRate) {
+    public Expense(int accountId, String title, ExpenseCategory category, double amount, Calendar date, int depositOrDeduct, boolean isRecurring, RecurrenceRate recurrenceRate) {
         this.accountId = accountId;
         this.title = title;
         this.category = category;
@@ -112,11 +113,11 @@ public class Expense {
         this.amount = amount;
     }
 
-    public Date getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 

@@ -3,12 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/dialog_bankaccount_new_accountname"
+        android:id="@+id/dialog_bankaccount_editaccount_accountname"
         android:inputType="textCapWords"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +16,7 @@
         android:layout_marginBottom="4dp"
         android:hint="Name of Bank Account" />
     <EditText
-        android:id="@+id/dialog_bankaccount_new_bankname"
+        android:id="@+id/dialog_bankaccount_editaccount_bankname"
         android:inputType="textCapWords"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,7 +27,7 @@
         android:hint="Name of Bank"/>
 
     <EditText
-        android:id="@+id/dialog_bankaccount_new_accounttype"
+        android:id="@+id/dialog_bankaccount_editaccount_accounttype"
         android:inputType="textCapWords"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,17 +36,6 @@
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
         android:hint="Account Type (e.g. Checking, Saving)"/>
-
-    <EditText
-        android:id="@+id/dialog_bankaccount_new_balance"
-        android:inputType="numberDecimal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="16dp"
-        android:hint="Starting Balance"/>
 
 
 </LinearLayout>

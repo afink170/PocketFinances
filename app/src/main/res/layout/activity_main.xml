@@ -40,8 +40,8 @@
         app:itemIconTint="@drawable/selector_bottomnav_item"
         app:itemTextColor="@drawable/selector_bottomnav_text"
         app:elevation="16dp"
-        app:menu="@menu/bottom_nav"/>
-
+        app:menu="@menu/bottom_nav"
+        app:labelVisibilityMode="labeled"/>
 
 
 </android.support.constraint.ConstraintLayout>

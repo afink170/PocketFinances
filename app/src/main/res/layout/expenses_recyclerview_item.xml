@@ -2,43 +2,57 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="50dp"
     android:background="@drawable/border_bottom"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/accounts_recyclerview_textview_accountname"
+        android:id="@+id/expenses_recyclerview_textview_expensedate"
+        android:text="09/18/18"
         android:layout_width="wrap_content"
-        android:layout_height="35dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
+        android:paddingRight="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:id="@+id/expenses_recyclerview_textview_expensename"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
         android:paddingTop="4dp"
         android:paddingLeft="4dp"
         android:paddingStart="4dp"
         android:paddingRight="0dp"
         android:paddingEnd="0dp"
         android:textSize="20sp"
-        android:text="Bank Account"
+        android:text="Expense Name"
         android:scrollHorizontally="true"
         android:ellipsize="end"
         android:maxLines="1"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/expenses_recyclerview_textview_expensedate"/>
 
     <TextView
-        android:id="@+id/accounts_recyclerview_textview_bankname"
+        android:id="@+id/expenses_recyclerview_textview_expensecategory"
         android:layout_width="wrap_content"
-        android:layout_height="25dp"
+        android:layout_height="20dp"
         android:paddingBottom="4dp"
-        android:paddingLeft="16dp"
-        android:paddingStart="16dp"
+        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
         android:paddingRight="0dp"
         android:paddingEnd="0dp"
-        android:text="Bank Name"
+        android:textSize="10sp"
+        android:text="Expense Category"
         android:scrollHorizontally="true"
         android:ellipsize="end"
         android:maxLines="1"
-        app:layout_constraintTop_toBottomOf="@id/accounts_recyclerview_textview_accountname"/>
+        app:layout_constraintTop_toBottomOf="@id/expenses_recyclerview_textview_expensename"
+        app:layout_constraintLeft_toRightOf="@+id/expenses_recyclerview_textview_expensedate"/>
 
     <TextView
-        android:id="@+id/accounts_recyclerview_textview_accountbalance"
+        android:id="@+id/expenses_recyclerview_textview_expenseamount"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
@@ -47,7 +61,7 @@
         android:paddingStart="0dp"
         android:paddingRight="4dp"
         android:paddingEnd="4dp"
-        android:text="$1000.03"
+        android:text="$1000.00"
         app:layout_constraintRight_toRightOf="parent"/>
 
 
