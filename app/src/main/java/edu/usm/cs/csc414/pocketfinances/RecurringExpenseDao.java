@@ -10,15 +10,18 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 @Dao
-public interface SubscriptionDao {
+public interface RecurringExpenseDao {
     @Insert
-    void insert(Subscription... subscription);
+    void insert(RecurringExpense... RecurringExpense);
 
     @Update
-    void update(Subscription... subscription);
+    void update(RecurringExpense... RecurringExpense);
 
     @Delete
-    void delete(Subscription... subscription);
+    void delete(RecurringExpense... RecurringExpense);
+
+    @Query("SELECT * FROM RecurringExpense ORDER BY date DESC")
+    LiveData<List<RecurringExpense>> getAllRecurringExpenses();
 
 
 }
