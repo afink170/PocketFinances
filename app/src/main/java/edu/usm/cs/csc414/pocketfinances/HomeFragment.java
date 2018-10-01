@@ -57,6 +57,8 @@ public class HomeFragment extends Fragment {
         }
         Log.d(TAG, "HomeFragment's UI elements successfully initialized.");
 
+        budgetTextView.setText("");
+
 
         sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         defaultAccountId = sharedPreferences.getInt(PREFS_DEFAULT_ACCOUNT, -1);
