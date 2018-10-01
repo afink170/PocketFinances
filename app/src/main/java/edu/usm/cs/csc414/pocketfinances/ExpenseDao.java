@@ -15,7 +15,6 @@ public interface ExpenseDao {
     @Insert
     void insert(Expense... expense);
 
-
     @Update
     void update(Expense... expense);
 
@@ -36,6 +35,4 @@ public interface ExpenseDao {
 
     @Query("SELECT * FROM Expense ORDER BY date DESC")
     LiveData<List<Expense>> getAllExpenses();
-
-
 }
