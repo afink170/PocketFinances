@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EditDeleteAccountDialog extends Dialog implements View.OnClickListener{
+public class EditDeleteAccountDialog extends Dialog implements View.OnClickListener {
 
     private Activity activity;
     private TextView editAccountTextView, deleteAccountTextView, setDefaultAccountTextView;
@@ -85,7 +85,7 @@ public class EditDeleteAccountDialog extends Dialog implements View.OnClickListe
     private void deleteAccount() {
         //showToastMessage("Delete Account button pressed!");
 
-        final AlertDialog.Builder confirmDeleteDialog = new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Dialog);
+        final AlertDialog.Builder confirmDeleteDialog = new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Light_Dialog);
 
         LayoutInflater inflater = activity.getLayoutInflater();
         View alertDialogView = inflater.inflate(R.layout.dialog_bankaccount_confirmdelete, null);
@@ -93,14 +93,13 @@ public class EditDeleteAccountDialog extends Dialog implements View.OnClickListe
         TextView confirmText = alertDialogView.findViewById(R.id.dialog_bankaccount_confirmdelete_textview);
         confirmText.setText("Are you sure you wish to delete \"" + account.getAccountName() + "?\"");
 
-        //confirmDeleteDialog.setTitle("Delete Bank Account");
         confirmDeleteDialog.setCancelable(true);
         confirmDeleteDialog.setView(alertDialogView);
 
         confirmDeleteDialog.setPositiveButton("Delete", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                //showToastMessage("Delete account confirmed!");
+                showToastMessage("Account deleted!");
                 viewModel.deleteItem(account);
                 dialogInterface.dismiss();
             }
@@ -109,7 +108,6 @@ public class EditDeleteAccountDialog extends Dialog implements View.OnClickListe
         confirmDeleteDialog.setNegativeButton("Cancel", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                //showToastMessage("Delete account cancelled!");
                 dialogInterface.dismiss();
             }
         });

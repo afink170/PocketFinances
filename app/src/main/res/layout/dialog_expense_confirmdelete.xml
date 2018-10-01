@@ -6,7 +6,7 @@
     android:layout_height="120dp">
 
     <TextView
-        android:id="@+id/dialog_bankaccount_confirmdelete_textview"
+        android:id="@+id/dialog_expense_confirmdelete_textview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="10dp"

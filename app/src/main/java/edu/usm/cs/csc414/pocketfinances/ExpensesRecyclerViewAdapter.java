@@ -17,6 +17,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
     private List<Expense> expenseList;
     private RecyclerView recyclerView;
     private View.OnClickListener onClickListener;
+    private View.OnLongClickListener onLongClickListener;
 
     public ExpensesRecyclerViewAdapter(List<Expense> expenseList) {
         this.expenseList = expenseList;
@@ -26,11 +27,16 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
         this.onClickListener = onClickListener;
     }
 
+    public void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
+    }
+
     @Override
     public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.expenses_recyclerview_item, parent, false);
         view.setOnClickListener(onClickListener);
+        view.setOnLongClickListener(onLongClickListener);
         return new RecyclerViewHolder(view);
     }
 

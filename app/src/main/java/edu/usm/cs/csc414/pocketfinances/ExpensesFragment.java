@@ -133,17 +133,15 @@ public class ExpensesFragment extends Fragment {
             }
         });
 
-
-
-
-        recyclerViewAdapter.setOnClickListener(new View.OnClickListener() {
+        recyclerViewAdapter.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onLongClick(View view) {
                 int itemPosition = recyclerView.getChildLayoutPosition(view);
                 Expense clickedExpense = viewModel.getExpensesList().getValue().get(itemPosition);
-                showToastMessage(clickedExpense.getTitle() + " clicked!");
-                //FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction())
 
+                EditDeleteExpenseDialog editDeleteExpenseDialog = new EditDeleteExpenseDialog(getActivity(), viewModel,clickedExpense);
+                editDeleteExpenseDialog.show();
+                return true;
             }
         });
     }
