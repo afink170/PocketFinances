@@ -47,7 +47,6 @@ public class AccountsRecyclerViewAdapter extends RecyclerView.Adapter<AccountsRe
     }
 
 
-
     @Override
     public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
         BankAccount bankAccount = bankAccountList.get(position);
@@ -59,6 +58,14 @@ public class AccountsRecyclerViewAdapter extends RecyclerView.Adapter<AccountsRe
         holder.bankTextView.setText(bankAccount.getBankName());
         holder.balanceTextView.setText(String.format(Locale.US,"$%.2f", bankAccount.getAccountBalance()));
         holder.itemView.setTag(bankAccount);
+
+        if (bankAccount.getAccountBalance() > 0.0) {
+            holder.balanceTextView.setTextColor(recyclerView.getResources().getColor(R.color.colorGreen));
+        }
+        else if (bankAccount.getAccountBalance() < 0.0) {
+            holder.balanceTextView.setText(String.format(Locale.US,"-$%.2f", Math.abs(bankAccount.getAccountBalance())));
+            holder.balanceTextView.setTextColor(recyclerView.getResources().getColor(R.color.colorRed));
+        }
     }
 
     @Override
@@ -81,6 +88,7 @@ public class AccountsRecyclerViewAdapter extends RecyclerView.Adapter<AccountsRe
             nameTextView = (TextView) view.findViewById(R.id.accounts_recyclerview_textview_accountname);
             bankTextView = (TextView) view.findViewById(R.id.accounts_recyclerview_textview_bankname);
             balanceTextView = (TextView) view.findViewById(R.id.accounts_recyclerview_textview_accountbalance);
+
         }
     }
 }

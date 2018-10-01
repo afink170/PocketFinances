@@ -15,6 +15,15 @@ public class ExpensesViewModel extends AndroidViewModel {
     private FinancesDatabase financesDatabase;
 
 
+    public ExpensesViewModel(Application application) {
+        super(application);
+
+        financesDatabase = FinancesDatabase.getDatabase(this.getApplication());
+
+        expensesList = financesDatabase.getExpenseDao().getAllExpenses();
+    }
+
+
     public ExpensesViewModel(Application application, int expenseId) {
         super(application);
 

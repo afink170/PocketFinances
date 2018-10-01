@@ -7,7 +7,8 @@ import android.content.Context;
 
 
 @Database(entities = { BankAccount.class, Expense.class },
-        version = 1)
+        version = 1,
+        exportSchema = true)
 public abstract class FinancesDatabase extends RoomDatabase {
 
     public abstract BankAccountDao getBankAccountDao();
