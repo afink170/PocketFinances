@@ -24,12 +24,9 @@ public class HomeFragment extends Fragment {
     TextView textView1, textView2, textView3, titleTextView, balanceTextView, budgetTextView, btnCaptionTextView;
     ImageButton addExpenseBtn, settingsBtn;
 
-    SharedPreferences sharedPreferences;
-    private static final String SHARED_PREFS = "shared_prefs";
-    private static final String PREFS_DEFAULT_ACCOUNT = "default_account";
-    private static final String PREFS_DEFAULT_IS_ALL_ACOUNTS = "default_is_all";
     int defaultAccountId;
-    boolean defaultIsAllAccounts = true;
+
+    CustomSharedPreferences sharedPreferences;
 
 
 
@@ -59,9 +56,9 @@ public class HomeFragment extends Fragment {
 
         budgetTextView.setText("");
 
+        sharedPreferences = new CustomSharedPreferences(getContext());
+        defaultAccountId = sharedPreferences.getDefaultAccountId();
 
-        sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        defaultAccountId = sharedPreferences.getInt(PREFS_DEFAULT_ACCOUNT, -1);
 
         if (defaultAccountId != -1) {
             observeAccountBalance();

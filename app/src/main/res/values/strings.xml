@@ -6,4 +6,7 @@
     <string name="edit_accounts_contentdescription">Edit Accounts</string>
     <string name="fragment_accounts_title_text">Accounts</string>
     <string name="add_new_expense_contentdescription">Add New Expense</string>
+    <string name="continue_text">Continue</string>
+    <string name="finish_text">Finish</string>
+    <string name="skip_text">Skip</string>
 </resources>

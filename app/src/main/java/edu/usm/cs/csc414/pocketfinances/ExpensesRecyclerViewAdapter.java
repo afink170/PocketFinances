@@ -52,7 +52,7 @@ public class ExpensesRecyclerViewAdapter extends RecyclerView.Adapter<ExpensesRe
 
         holder.nameTextView.setText(expense.getTitle());
         holder.dateTextView.setText(DateFormat.getDateInstance(DateFormat.DATE_FIELD, Locale.US).toString());
-        holder.dateTextView.setText(String.format(Locale.US, "%2d/%2d/%4d", expense.getDate().get(Calendar.MONTH)+1,
+        holder.dateTextView.setText(String.format(Locale.US, "%02d/%02d/%4d", expense.getDate().get(Calendar.MONTH)+1,
                 expense.getDate().get(Calendar.DAY_OF_MONTH), expense.getDate().get(Calendar.YEAR)));
         holder.categoryTextView.setText(expense.getCategory().getText());
         holder.amountTextView.setText(String.format(Locale.US, "$%.2f", expense.getAmount()));

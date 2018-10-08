@@ -127,6 +127,7 @@ public class ExpensesFragment extends Fragment {
                 AccountsFragment accountsFragment = new AccountsFragment();
 
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.setCustomAnimations(R.animator.slide_right_left_in, R.animator.slide_right_left_out);
                 fragmentTransaction
                         .replace(R.id.activity_main_framelayout, accountsFragment)
                         .commit();

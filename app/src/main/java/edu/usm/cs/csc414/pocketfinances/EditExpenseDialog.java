@@ -132,7 +132,7 @@ public class EditExpenseDialog extends Dialog {
         expenseTitle.setText(expense.getTitle());
         expenseAmount.setText(String.format(Locale.US, "%.2f", expense.getAmount()));
 
-        expenseDate.setText(String.format(Locale.US, "%2d/%2d/%4d",
+        expenseDate.setText(String.format(Locale.US, "%02d/%02d/%4d",
                 date.get(Calendar.MONTH)+1,
                 date.get(Calendar.DAY_OF_MONTH),
                 date.get(Calendar.YEAR)));

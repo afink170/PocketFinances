@@ -74,11 +74,7 @@ public class EditDeleteAccountDialog extends Dialog implements View.OnClickListe
 
 
     private void setAsDefaultAccount() {
-        final String SHARED_PREFS = "shared_prefs";
-        final String PREFS_DEFAULT_ACCOUNT = "default_account";
-
-        SharedPreferences sharedPreferences = sharedPreferences = getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putInt(PREFS_DEFAULT_ACCOUNT, account.getAccountId()).apply();
+        new CustomSharedPreferences(getContext()).setDefaultAccountId(account.getAccountId());
     }
 
 
@@ -100,6 +96,10 @@ public class EditDeleteAccountDialog extends Dialog implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 showToastMessage("Account deleted!");
+
+                if (new CustomSharedPreferences(getContext()).getDefaultAccountId() == account.getAccountId())
+                    new CustomSharedPreferences(getContext()).setDefaultAccountId(-1);
+
                 viewModel.deleteItem(account);
                 dialogInterface.dismiss();
             }
