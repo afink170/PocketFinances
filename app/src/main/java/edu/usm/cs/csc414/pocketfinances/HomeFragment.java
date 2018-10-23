@@ -59,17 +59,24 @@ public class HomeFragment extends Fragment {
         sharedPreferences = new CustomSharedPreferences(getContext());
         defaultAccountId = sharedPreferences.getDefaultAccountId();
 
+        try {
 
-        if (defaultAccountId != -1) {
-            observeAccountBalance();
+            if (defaultAccountId != -1) {
+                Log.v(TAG, "Attempting to observe default account in database.");
+                observeAccountBalance();
+            } else {
+                balanceTextView.setText("$0.00");
+            }
+
+            // Set listeners for UI elements, such as OnClick listeners for buttons
+            Log.v(TAG, "Attempting to set UI event listeners.");
+            setListeners();
+
+        } catch(Exception e) {
+            Log.e(TAG, "Failed to set listeners and observe the database instance.", e);
         }
-        else {
-            balanceTextView.setText("$0.00");
-        }
 
-        // Set listeners for UI elements, such as OnClick listeners for buttons
-        setListeners();
-
+        Log.d(TAG, "View successfully created.");
         return view;
     }
 
@@ -107,6 +114,10 @@ public class HomeFragment extends Fragment {
             public void onChanged(@Nullable BankAccount bankAccount) {
                 if (bankAccount == null) {
                     Log.e(TAG, "Failed to get balance of default account.");
+
+                    balanceTextView.setText(String.format(Locale.US, "$%.2f", 0.0));
+                    balanceTextView.setTextColor(getResources().getColor(R.color.colorWhite));
+
                     return;
                 }
 

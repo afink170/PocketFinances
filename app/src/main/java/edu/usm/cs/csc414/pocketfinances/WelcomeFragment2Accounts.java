@@ -68,11 +68,13 @@ public class WelcomeFragment2Accounts extends Fragment {
                                 BankAccount newAccount = new BankAccount(bankNameText, accountNameText,
                                         accountTypeText, Double.parseDouble(accountBalanceText));
 
+
                                 new CustomSharedPreferences(getContext()).setDefaultAccountId(newAccount.getAccountId());
 
                                 viewModel.insertItem(newAccount);
 
                                 dialogInterface.cancel();
+                                showToastMessage(newAccount.getAccountName() + " added!");
                             }
                         } catch (Exception e) {
                             Log.e(TAG, "Failed to get user input from AlertDialog.", e);

@@ -74,13 +74,9 @@ public class AppClass extends Application {
 
             // Generate or set encryption key, then store it in sharedPrefs as an encrypted string.
             // That way, the encryption key is never stored as plain text
-            /*
-                TODO : Change to second method instead.  First method is just for testing.
-                TODO : However, note that changing this to generate instead of set WILL PROBABLY BREAK DATABASE ON ANY EXISTING CLIENT!
-                TODO : Therefore, you must completely delete app data on device and rebuild once you change this.
-            */
-            sharedPrefs.setEncryptKeyAndStore("test_encrypt_key".toCharArray());
-            //sharedPrefs.generateEncryptKeyAndStore();
+
+            //sharedPrefs.setEncryptKeyAndStore("test_encrypt_key".toCharArray());
+            sharedPrefs.generateEncryptKeyAndStore();
 
 
             // Number of bytes of salt
@@ -138,7 +134,7 @@ public class AppClass extends Application {
 
 
         }
-        else if (sharedPrefs.getPasswordEnabled() || TESTING_PASSWORD_ACTIVITY) {
+        else if (sharedPrefs.getPasswordEnabled() && TESTING_PASSWORD_ACTIVITY) {
 
             // Launch PasswordActivity
             Intent intent = new Intent(this, PasswordActivity.class);
@@ -152,30 +148,32 @@ public class AppClass extends Application {
 
 
         //------------------------ HANDLE DATABASE ENCRYPTION STATE --------------------
-        // Get database state
-        SQLCipherUtils.State state = SQLCipherUtils.getDatabaseState(getApplicationContext(), DB_NAME);
+        try {
+            // Get database state
+            SQLCipherUtils.State state = SQLCipherUtils.getDatabaseState(getApplicationContext(), DB_NAME);
 
-        // Check whether database is encrypted
+            // Check whether database is encrypted
 
-        if (state == SQLCipherUtils.State.UNENCRYPTED) {
-            // If it's unencrypted, encrypt the database
-            try {
-                FinancesDatabase db = FinancesDatabase.getDatabase(getApplicationContext());
-                db.close();
-                SQLCipherUtils.encrypt(getApplicationContext(), DB_NAME, sharedPrefs.getEncryptKey());
-                Log.i(TAG, "Successfully encrypted database!");
-            } catch (IOException e) {
-                Log.e(TAG, "Failed to encrypt previously unencrypted database!", e);
-            }
+            if (state == SQLCipherUtils.State.UNENCRYPTED) {
+                // If it's unencrypted, encrypt the database
+                try {
+                    FinancesDatabase db = FinancesDatabase.getDatabase(getApplicationContext());
+                    db.close();
+                    SQLCipherUtils.encrypt(getApplicationContext(), DB_NAME, sharedPrefs.getEncryptKey());
+                    Log.i(TAG, "Successfully encrypted database!");
+                } catch (IOException e) {
+                    Log.e(TAG, "Failed to encrypt previously unencrypted database!", e);
+                }
+            } else if (state == SQLCipherUtils.State.ENCRYPTED)
+                // Otherwise, good to go
+                Log.i(TAG, "Database is encrypted.  No action necessary.");
+            else if (state == SQLCipherUtils.State.DOES_NOT_EXIST)
+                // No database found.  Normal if first launch
+                Log.e(TAG, "No database found.  Will create on later.");
+
+        } catch(Exception e) {
+            Log.e(TAG, "Failed to get database encryption state!", e);
         }
-        else if (state == SQLCipherUtils.State.ENCRYPTED)
-            // Otherwise, good to go
-            Log.i(TAG, "Database is encrypted.  No action necessary.");
-        else if (state == SQLCipherUtils.State.DOES_NOT_EXIST)
-            // No database found.  Normal if first launch
-            Log.e(TAG, "No database found.  Will create on later.");
-
-
     }
 
 

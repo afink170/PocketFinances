@@ -84,12 +84,30 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.nav_subscriptions:
                         if (R.id.nav_subscriptions != activeFragmentId) {
-                            // Launch new fragment
+
+                            if (activeFragmentId == R.id.nav_budget)
+                                fragmentTransaction.setCustomAnimations(R.animator.slide_right_left_in, R.animator.slide_right_left_out);
+                            else
+                                fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+
+                            fragmentTransaction
+                                    .replace(fragmentHolder.getId(), new RecurringPaymentsFragment(), "RecurringPaymentsFragment")
+                                    .addToBackStack(null)
+                                    .commit();
+                            activeFragmentId = R.id.nav_subscriptions;
                         }
                         return true;
                     case R.id.nav_budget:
                         if (R.id.nav_budget != activeFragmentId) {
-                            // Launch new fragment
+
+                            fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+
+                            fragmentTransaction
+                                    .replace(fragmentHolder.getId(), new BudgetFragment(), "BudgetFragment")
+                                    .addToBackStack(null)
+                                    .commit();
+                            activeFragmentId = R.id.nav_budget;
+
                         }
                         return true;
                 }

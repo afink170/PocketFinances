@@ -32,10 +32,10 @@ import java.util.Locale;
 
 public class NewExpenseDialog extends Dialog {
 
-    Activity activity;
-    int accountId;
-    Calendar date;
-    List<BankAccount> bankAccounts;
+    private Activity activity;
+    private int accountId;
+    private Calendar date;
+    private List<BankAccount> bankAccounts;
 
     // UI elements
     private Spinner categorySpinner, recurrenceSpinner, bankAccountSpinner;
