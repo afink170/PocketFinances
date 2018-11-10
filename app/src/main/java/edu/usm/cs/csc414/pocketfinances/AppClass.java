@@ -24,7 +24,8 @@ public class AppClass extends Application {
 
     // Constants for testing of password activity and welcome activity
     private static final boolean TESTING_WELCOME_ACTIVITY = false;
-    private static final boolean TESTING_PASSWORD_ACTIVITY = false;
+    private static final boolean TESTING_PASSWORD_ACTIVITY = true;
+    private static final boolean TESTING_FINGERPRINT_ACTIVITY = true;
     private static final char[] DEFAULT_TEST_PASSWORD = {'0', '0', '0', '0'};
 
 
@@ -61,8 +62,9 @@ public class AppClass extends Application {
 
         // TODO : Remove this once testing of PasswordActivity and WelcomeActivity is complete
         // If testing password or welcome activity, or if actual first run, set shared preferences first run to true
-        sharedPrefs.setIsFirstRun(TESTING_PASSWORD_ACTIVITY || TESTING_WELCOME_ACTIVITY || sharedPrefs.getIsFirstRun());
-
+        //sharedPrefs.setIsFirstRun(TESTING_PASSWORD_ACTIVITY || TESTING_WELCOME_ACTIVITY || sharedPrefs.getIsFirstRun());
+        sharedPrefs.setFingerprintEnabled(TESTING_FINGERPRINT_ACTIVITY);
+        sharedPrefs.setPasswordEnabled(TESTING_PASSWORD_ACTIVITY);
 
 
 
@@ -74,8 +76,6 @@ public class AppClass extends Application {
 
             // Generate or set encryption key, then store it in sharedPrefs as an encrypted string.
             // That way, the encryption key is never stored as plain text
-
-            //sharedPrefs.setEncryptKeyAndStore("test_encrypt_key".toCharArray());
             sharedPrefs.generateEncryptKeyAndStore();
 
 
@@ -134,7 +134,7 @@ public class AppClass extends Application {
 
 
         }
-        else if (sharedPrefs.getPasswordEnabled() && TESTING_PASSWORD_ACTIVITY) {
+        else if (sharedPrefs.getPasswordEnabled() || TESTING_PASSWORD_ACTIVITY) {
 
             // Launch PasswordActivity
             Intent intent = new Intent(this, PasswordActivity.class);
@@ -144,32 +144,37 @@ public class AppClass extends Application {
 
 
 
-
-
-
         //------------------------ HANDLE DATABASE ENCRYPTION STATE --------------------
         try {
             // Get database state
             SQLCipherUtils.State state = SQLCipherUtils.getDatabaseState(getApplicationContext(), DB_NAME);
 
             // Check whether database is encrypted
-
             if (state == SQLCipherUtils.State.UNENCRYPTED) {
                 // If it's unencrypted, encrypt the database
                 try {
+                    // Get database instance
                     FinancesDatabase db = FinancesDatabase.getDatabase(getApplicationContext());
+
+                    // Close database
                     db.close();
+
+                    // Encrypt database with encryption key
                     SQLCipherUtils.encrypt(getApplicationContext(), DB_NAME, sharedPrefs.getEncryptKey());
                     Log.i(TAG, "Successfully encrypted database!");
+
                 } catch (IOException e) {
                     Log.e(TAG, "Failed to encrypt previously unencrypted database!", e);
                 }
             } else if (state == SQLCipherUtils.State.ENCRYPTED)
+
                 // Otherwise, good to go
                 Log.i(TAG, "Database is encrypted.  No action necessary.");
+
             else if (state == SQLCipherUtils.State.DOES_NOT_EXIST)
+
                 // No database found.  Normal if first launch
-                Log.e(TAG, "No database found.  Will create on later.");
+                Log.e(TAG, "No database found.");
 
         } catch(Exception e) {
             Log.e(TAG, "Failed to get database encryption state!", e);

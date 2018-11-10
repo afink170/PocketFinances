@@ -11,7 +11,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -32,8 +35,11 @@ import java.util.Locale;
 
 public class NewExpenseDialog extends Dialog {
 
+    private final String TAG = getClass().getSimpleName();
+
     private Activity activity;
     private int accountId;
+    private boolean isRecurringFirstOccurrence;
     private Calendar date;
     private List<BankAccount> bankAccounts;
 
@@ -49,6 +55,14 @@ public class NewExpenseDialog extends Dialog {
         super(activity);
         this.activity = activity;
         this.accountId = accountId;
+        this.isRecurringFirstOccurrence = false;
+    }
+
+    public NewExpenseDialog(@NonNull Activity activity, boolean isRecurringFirstOccurrence) {
+        super(activity);
+        this.activity = activity;
+        this.accountId = -1;
+        this.isRecurringFirstOccurrence = isRecurringFirstOccurrence;
     }
 
 
@@ -118,7 +132,8 @@ public class NewExpenseDialog extends Dialog {
 
 
     private void setInitialStates() {
-        isRecurringCheckBox.setChecked(false);
+        isRecurringCheckBox.setEnabled(!isRecurringFirstOccurrence);
+        isRecurringCheckBox.setChecked(isRecurringFirstOccurrence);
 
         recurrenceSpinner.setSelection(0);
         recurrenceSpinner.setEnabled(isRecurringCheckBox.isChecked());
@@ -130,14 +145,14 @@ public class NewExpenseDialog extends Dialog {
             for (int  i = 0; i < bankAccounts.size(); i++) {
                 if (accountId == bankAccounts.get(i).getAccountId()) {
                     bankAccountSpinner.setSelection(i);
+                    break;
                 }
 
             }
         }
 
 
-        expenseDate.setText(String.format(Locale.US, "%02d/%02d/%4d",
-                date.get(Calendar.MONTH)+1, date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.YEAR)));
+        expenseDate.setText(ExpenseTypeConverters.dateToString(date));
 
         setDepositDeductionColors();
     }
@@ -193,8 +208,7 @@ public class NewExpenseDialog extends Dialog {
                         date.set(Calendar.MONTH, monthOfYear);
                         date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                        expenseDate.setText(String.format(Locale.US, "%2d/%2d/%4d",
-                                date.get(Calendar.MONTH)+1, date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.YEAR)));
+                        expenseDate.setText(ExpenseTypeConverters.dateToString(date));
                     }
                 }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
@@ -329,12 +343,29 @@ public class NewExpenseDialog extends Dialog {
             return false;
         } else {
             Expense newExpense = new Expense(activeAccount, expenseTitleText, category,
-                    expenseAmountText, date, depositOrDeduction, isRecurring, recurrenceRate);
+                    expenseAmountText, trim(date), depositOrDeduction, isRecurring, recurrenceRate);
 
+            Log.v(TAG, newExpense.toString());
             new AsyncInsertExpense(getContext()).execute(newExpense);
-            new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
+
+            if (!newExpense.getIsRecurring()) {
+                new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
+            }
+            else {
+                new AddRecurringExpensesTask((AppCompatActivity) activity).execute();
+            }
 
             return true;
         }
+    }
+
+
+    private static Calendar trim(Calendar date) {
+        date.set(Calendar.MILLISECOND, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.HOUR, 0);
+
+        return date;
     }
 }

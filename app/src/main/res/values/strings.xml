@@ -9,4 +9,9 @@
     <string name="continue_text">Continue</string>
     <string name="finish_text">Finish</string>
     <string name="skip_text">Skip</string>
+    <string name="fingerprint_icon_description">Scan Fingerprint</string>
+    <string name="bottom_nav_item_title_home">Home</string>
+    <string name="bottom_nav_item_title_accounts">Accounts</string>
+    <string name="bottom_nav_item_title_recurrences">Recurrences</string>
+    <string name="bottom_nav_item_title_budget">Budget</string>
 </resources>

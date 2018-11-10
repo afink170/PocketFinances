@@ -30,6 +30,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'io.github.luizgrp.sectionedrecyclerviewadapter:sectionedrecyclerviewadapter:1.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.1.6'
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
     implementation 'com.github.talhahasanzia:android-encryption-helper:0.3.1'

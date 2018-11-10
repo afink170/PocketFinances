@@ -5,10 +5,14 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class ExpensesViewModel extends AndroidViewModel {
+
+    private final String TAG = getClass().getSimpleName();
 
     private final LiveData<List<Expense>> expensesList;
 
@@ -21,6 +25,28 @@ public class ExpensesViewModel extends AndroidViewModel {
         financesDatabase = FinancesDatabase.getDatabase(this.getApplication());
 
         expensesList = financesDatabase.getExpenseDao().getAllExpenses();
+    }
+
+    public ExpensesViewModel(Application application, boolean getRecurring, @Nullable Calendar currentTime) {
+        super(application);
+
+        financesDatabase = FinancesDatabase.getDatabase(this.getApplication());
+
+        if (getRecurring) {
+
+            if (currentTime != null) {
+                Log.v(TAG, "Querying the database for parent recurring expenses with nextOcurrence before current time.");
+                expensesList = financesDatabase.getExpenseDao().getAllRecurringExpensesBeforeDate(currentTime.getTimeInMillis());
+            }
+            else {
+                Log.v(TAG, "Querying the database for parent recurring expenses.");
+                expensesList = financesDatabase.getExpenseDao().getAllRecurringExpenses();
+            }
+        }
+        else {
+            Log.v(TAG, "Querying the database for all expenses.");
+            expensesList = financesDatabase.getExpenseDao().getAllExpenses();
+        }
     }
 
 
@@ -38,14 +64,22 @@ public class ExpensesViewModel extends AndroidViewModel {
 
         financesDatabase = FinancesDatabase.getDatabase(this.getApplication());
 
-        if (category == null && accountId != null)
+        if (category == null && accountId != null) {
+            Log.v(TAG, "Querying the database for all expenses with accountId="+accountId+".");
             expensesList = financesDatabase.getExpenseDao().getExpensesOnAccount(accountId);
-        else if (accountId == null && category != null)
+        }
+        else if (accountId == null && category != null) {
+            Log.v(TAG, "Querying the database for all expenses with category="+category.getText()+".");
             expensesList = financesDatabase.getExpenseDao().getExpensesOnCategoryValue(category.getValue());
-        else if (accountId != null)
+        }
+        else if (accountId != null) {
+            Log.v(TAG, "Querying the database for all expenses with category="+category.getText()+" and accountId="+accountId+".");
             expensesList = financesDatabase.getExpenseDao().getExpensesOnCategoryAndAccount(category.getValue(), accountId);
-        else
+        }
+        else {
+            Log.v(TAG, "Querying the database for all expenses.");
             expensesList = financesDatabase.getExpenseDao().getAllExpenses();
+        }
     }
 
 
@@ -54,12 +88,18 @@ public class ExpensesViewModel extends AndroidViewModel {
     }
 
 
-    public void deleteItem(Expense expense) {
-        new deleteAsyncTask(financesDatabase).execute(expense);
+
+
+    public void deleteItem(Expense... expenses) {
+        new deleteAsyncTask(financesDatabase).execute(expenses);
     }
 
-    public void insertItem(Expense expense) {
-        new insertAsyncTask(financesDatabase).execute(expense);
+    public void insertItem(Expense... expenses) {
+        new insertAsyncTask(financesDatabase).execute(expenses);
+    }
+
+    public void updateItem(Expense... expenses) {
+        new updateAsyncTask(financesDatabase).execute(expenses);
     }
 
 
@@ -76,7 +116,6 @@ public class ExpensesViewModel extends AndroidViewModel {
             db.getExpenseDao().delete(expenses);
             return null;
         }
-
     }
 
     private static class insertAsyncTask extends AsyncTask<Expense, Void, Void> {
@@ -89,6 +128,20 @@ public class ExpensesViewModel extends AndroidViewModel {
         @Override
         protected Void doInBackground(Expense... expenses) {
             db.getExpenseDao().insert(expenses);
+            return null;
+        }
+    }
+
+    private static class updateAsyncTask extends AsyncTask<Expense, Void, Void> {
+        private FinancesDatabase db;
+
+        updateAsyncTask(FinancesDatabase appDatabase) {
+            db = appDatabase;
+        }
+
+        @Override
+        protected Void doInBackground(Expense... expenses) {
+            db.getExpenseDao().update(expenses);
             return null;
         }
     }

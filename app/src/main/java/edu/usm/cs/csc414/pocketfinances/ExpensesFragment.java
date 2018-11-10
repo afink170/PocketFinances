@@ -64,6 +64,7 @@ public class ExpensesFragment extends Fragment {
             getActivity().getSupportFragmentManager().popBackStack();
         }
 
+        /*
         try {
             // Initialize custom font from resource
             FONT_WALKWAY = Typeface.createFromAsset(getActivity().getAssets(), getString(R.string.font_walkway_black));
@@ -74,6 +75,7 @@ public class ExpensesFragment extends Fragment {
             Log.e(TAG, "Unable to set font of application text.");
         }
         Log.d(TAG, "Font of UI text successfully set.");
+        */
 
 
         // Initialize the RecyclerView for holding the list of accounts
@@ -91,7 +93,7 @@ public class ExpensesFragment extends Fragment {
 
         // Initialize the ViewModel
         viewModel = ViewModelProviders.of(this,
-                new ExpenseViewModelFactory(this.getActivity().getApplication(),
+                new ExpensesViewModelFactory(this.getActivity().getApplication(),
                         activeAccountId, null)).get(ExpensesViewModel.class);
 
         // Set the ViewModel to observe the live BankAccount data list
@@ -99,6 +101,7 @@ public class ExpensesFragment extends Fragment {
         viewModel.getExpensesList().observe(getActivity(), new Observer<List<Expense>>() {
             @Override
             public void onChanged(@Nullable List<Expense> expenseList) {
+                Log.d(TAG, "Expenses received.  Populating RecyclerView.");
                 recyclerViewAdapter.addItems(expenseList);
             }
         });

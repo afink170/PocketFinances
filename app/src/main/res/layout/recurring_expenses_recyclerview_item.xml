@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recurring_expenses_recyclerview_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@drawable/border_bottom"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/recurring_expenses_recyclerview_textview_expensename"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:paddingTop="4dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="0dp"
+        android:layout_marginEnd="4dp"
+        android:textSize="20sp"
+        android:text="Expense Name"
+        android:scrollHorizontally="true"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintRight_toLeftOf="@+id/recurring_expenses_recyclerview_textview_expenseamount"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:id="@+id/recurring_expenses_recyclerview_textview_expensedate"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:paddingBottom="4dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="0dp"
+        android:textSize="12sp"
+        android:text="First Expense Date"
+        android:scrollHorizontally="true"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@id/recurring_expenses_recyclerview_textview_expensename"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:id="@+id/recurring_expenses_recyclerview_textview_expenseamount"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:textSize="20sp"
+        android:paddingStart="0dp"
+        android:paddingEnd="4dp"
+        android:text="$1000.00"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <!-- This TextView should be hidden.  It is just storing the id for retrieval of the expense upon click -->
+    <TextView
+        android:id="@+id/recurring_expenses_recyclerview_textview_expenseid"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
+
+
+
+</android.support.constraint.ConstraintLayout>

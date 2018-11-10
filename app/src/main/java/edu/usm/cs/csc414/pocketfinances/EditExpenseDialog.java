@@ -30,16 +30,17 @@ import java.util.Locale;
 
 public class EditExpenseDialog extends Dialog {
 
-    Activity activity;
-    Expense expense;
-    Calendar date;
-    List<BankAccount> bankAccounts;
+    private Activity activity;
+    private Expense expense;
+    private Calendar date;
+    private List<BankAccount> bankAccounts;
+    private boolean isRecurringFirstOccurrence;
 
     // UI elements
     private Spinner categorySpinner, recurrenceSpinner, bankAccountSpinner;
     private EditText expenseTitle, expenseAmount, expenseDate;
     private CheckBox isRecurringCheckBox;
-    private TextView isDeposit, isDeduction, cancelBtn, saveBtn;
+    private TextView isDeposit, isDeduction, cancelBtn, saveBtn, footerNote;
     private int depositOrDeduction = Expense.DEDUCT;
 
 
@@ -48,6 +49,7 @@ public class EditExpenseDialog extends Dialog {
         this.activity = activity;
         this.expense = expense;
         this.date = expense.getDate();
+        this.isRecurringFirstOccurrence = expense.getIsFirstOccurrence() && expense.getIsRecurring();
     }
 
     @Override
@@ -72,6 +74,7 @@ public class EditExpenseDialog extends Dialog {
         isDeduction = findViewById(R.id.dialog_expense_edit_toggleexpense);
         cancelBtn = findViewById(R.id.dialog_expense_edit_cancel);
         saveBtn = findViewById(R.id.dialog_expense_edit_save);
+        footerNote = findViewById(R.id.dialog_expense_edit_note);
 
         observeAccounts();
         setSpinnerAdapters();
@@ -112,7 +115,7 @@ public class EditExpenseDialog extends Dialog {
 
 
     private void setInitialStates() {
-        isRecurringCheckBox.setChecked(expense.isRecurring());
+        isRecurringCheckBox.setChecked(expense.getIsRecurring());
 
         recurrenceSpinner.setSelection(getActiveRecurrenceSpinnerPos());
         recurrenceSpinner.setEnabled(isRecurringCheckBox.isChecked());
@@ -137,7 +140,16 @@ public class EditExpenseDialog extends Dialog {
                 date.get(Calendar.DAY_OF_MONTH),
                 date.get(Calendar.YEAR)));
 
+        depositOrDeduction = expense.getDepositOrDeduct();
         setDepositDeductionColors();
+
+
+        footerNote.setVisibility(isRecurringFirstOccurrence ? View.VISIBLE : View.INVISIBLE);
+
+        if (isRecurringFirstOccurrence) {
+            isRecurringCheckBox.setEnabled(false);
+            isRecurringCheckBox.setChecked(true);
+        }
     }
 
 
@@ -359,7 +371,9 @@ public class EditExpenseDialog extends Dialog {
             expense.setRecurrenceRate(recurrenceRate);
 
             new AsyncUpdateExpense(getContext()).execute(expense);
-            new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
+
+            if (!isRecurringFirstOccurrence)
+                new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
 
             return true;
         }

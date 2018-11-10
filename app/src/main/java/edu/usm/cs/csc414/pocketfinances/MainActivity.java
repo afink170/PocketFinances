@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Add any new expenses in the background
+        new AddRecurringExpensesTask(this).execute();
+
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
@@ -82,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
                             activeFragmentId = R.id.nav_accounts;
                         }
                         return true;
-                    case R.id.nav_subscriptions:
-                        if (R.id.nav_subscriptions != activeFragmentId) {
+                    case R.id.nav_recurringexpenses:
+                        if (R.id.nav_recurringexpenses != activeFragmentId) {
 
                             if (activeFragmentId == R.id.nav_budget)
                                 fragmentTransaction.setCustomAnimations(R.animator.slide_right_left_in, R.animator.slide_right_left_out);
@@ -91,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
                                 fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
 
                             fragmentTransaction
-                                    .replace(fragmentHolder.getId(), new RecurringPaymentsFragment(), "RecurringPaymentsFragment")
+                                    .replace(fragmentHolder.getId(), new RecurringExpensesFragment(), "RecurringExpensesFragment")
                                     .addToBackStack(null)
                                     .commit();
-                            activeFragmentId = R.id.nav_subscriptions;
+                            activeFragmentId = R.id.nav_recurringexpenses;
                         }
                         return true;
                     case R.id.nav_budget:

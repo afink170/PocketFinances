@@ -3,6 +3,7 @@ package edu.usm.cs.csc414.pocketfinances;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
+import android.util.Log;
 
 import com.thz.keystorehelper.KeyStoreManager;
 
@@ -16,6 +17,8 @@ import java.util.Arrays;
  */
 public class CustomSharedPreferences {
 
+    private static final String TAG = "CustomSharedPrefs";
+
     private static final String SHARED_PREFS = "shared_prefs";
     private static final String PREFS_DEFAULT_ACCOUNT = "default_account";
     private static final String PREFS_DEFAULT_IS_ALL_ACCOUNTS = "default_is_all";
@@ -24,6 +27,7 @@ public class CustomSharedPreferences {
     private static final String PREFS_FIRST_RUN = "is_first_run";
     private static final String PREFS_PASSWORD_ENABLED = "password_enabled";
     private static final String PREFS_ENCRYPT_KEY = "encrypt_key";
+    private static final String PREFS_FINGERPRINT_ENABLED = "fingerprint_enabled";
 
     private static final String KEYSTORE_ENCRYPT_ALIAS = "encrypt_alias";
 
@@ -31,7 +35,7 @@ public class CustomSharedPreferences {
     private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
     private Context context;
 
-    CustomSharedPreferences(Context context) {
+    public CustomSharedPreferences(Context context) {
         this.context = context;
         this.sharedPrefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     }
@@ -189,11 +193,17 @@ public class CustomSharedPreferences {
      * Generates a random 10 character long database encryption key using KeyStore and encrypts it before storing it in shared preferences.
      */
     public void generateEncryptKeyAndStore() {
-        KeyStoreManager.init(context);
-        char[] randomKey = KeyStoreManager.getNewRandomPhrase(10).toCharArray();
-        String encryptedKey = KeyStoreManager.encryptData(Arrays.toString(randomKey), KEYSTORE_ENCRYPT_ALIAS);
-        randomKey = null;
-        sharedPrefs.edit().putString(PREFS_ENCRYPT_KEY, encryptedKey).apply();
+        // Only generate and store a new encryption key if one does not already exist in SharedPreferences.
+        if (sharedPrefs.getString(PREFS_ENCRYPT_KEY, "").equals("")) {
+            KeyStoreManager.init(context);
+            char[] randomKey = KeyStoreManager.getNewRandomPhrase(10).toCharArray();
+            String encryptedKey = KeyStoreManager.encryptData(Arrays.toString(randomKey), KEYSTORE_ENCRYPT_ALIAS);
+            randomKey = null;
+            sharedPrefs.edit().putString(PREFS_ENCRYPT_KEY, encryptedKey).apply();
+        }
+        else {
+            Log.d(TAG, "Encryption key already generated.  No action performed.");
+        }
     }
 
 
@@ -207,5 +217,24 @@ public class CustomSharedPreferences {
         String encryptedKey = KeyStoreManager.encryptData(Arrays.toString(key), KEYSTORE_ENCRYPT_ALIAS);
         key = null;
         sharedPrefs.edit().putString(PREFS_ENCRYPT_KEY, encryptedKey).apply();
+    }
+
+
+    /**
+     * Gets whether fingerprint authentication is enabled.
+     *
+     * @return True if fingerprint authentication is enabled, and false otherwise.
+     */
+    public boolean getFingerprintEnabled() {
+        return sharedPrefs.getBoolean(PREFS_FINGERPRINT_ENABLED, false);
+    }
+
+    /**
+     * Sets whether fingerprint authentication is enabled.
+     *
+     * @param enabled Whether or not fingerprint authentication is enabled.
+     */
+    public void setFingerprintEnabled(boolean enabled) {
+        sharedPrefs.edit().putBoolean(PREFS_FINGERPRINT_ENABLED, enabled).apply();
     }
 }

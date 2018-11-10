@@ -2,6 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.usm.cs.csc414.pocketfinances">
 
+    <uses-feature
+        android:name="android.hardware.fingerprint"
+        android:required="false"/>
+
+
+    <!-- USE_FINGERPRINT is deprecated and has been replaced with USES_BIOMETRIC.
+         However, since we are ONLY supporting fingerprint, and not iris or face,
+         we will still use USE_FINGERPRINT, as it works perfectly fine. -->
+    <uses-permission
+        android:name="android.permission.USE_FINGERPRINT" />
+
     <application
         android:name=".AppClass"
         android:allowClearUserData="true"

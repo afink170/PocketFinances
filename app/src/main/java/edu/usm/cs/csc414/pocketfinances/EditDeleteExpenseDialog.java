@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -16,8 +17,10 @@ import android.widget.Toast;
 
 public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListener {
 
+    private static final String TAG = "EditDeleteExpense";
+
     private Activity activity;
-    private TextView editAccountTextView, deleteAccountTextView;
+    private TextView editExpenseTextView, deleteExpenseTextView;
     private Expense expense;
     private ExpensesViewModel expensesViewModel;
 
@@ -33,11 +36,11 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_expense_editdelete);
-        editAccountTextView = findViewById(R.id.dialog_expense_editdelete_edit_textview);
-        deleteAccountTextView = findViewById(R.id.dialog_expense_editdelete_delete_textview);
+        editExpenseTextView = findViewById(R.id.dialog_expense_editdelete_edit_textview);
+        deleteExpenseTextView = findViewById(R.id.dialog_expense_editdelete_delete_textview);
 
-        editAccountTextView.setOnClickListener(this);
-        deleteAccountTextView.setOnClickListener(this);
+        editExpenseTextView.setOnClickListener(this);
+        deleteExpenseTextView.setOnClickListener(this);
     }
 
 
@@ -45,10 +48,11 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.dialog_expense_editdelete_edit_textview:
-                editAccount();
+                editExpense();
                 dismiss();
                 break;
             case R.id.dialog_expense_editdelete_delete_textview:
+                Log.v(TAG, "deleteExpense button clicked!");
                 deleteExpense();
                 dismiss();
                 break;
@@ -67,12 +71,14 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
 
     private void deleteExpense() {
 
+        Log.v(TAG, "Begin deleteExpense transaction.");
+
         final AlertDialog.Builder confirmDeleteDialog = new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Light_Dialog);
 
         LayoutInflater inflater = activity.getLayoutInflater();
-        View alertDialogView = inflater.inflate(R.layout.dialog_bankaccount_confirmdelete, null);
+        View alertDialogView = inflater.inflate(R.layout.dialog_expense_confirmdelete, null);
 
-        TextView confirmText = alertDialogView.findViewById(R.id.dialog_bankaccount_confirmdelete_textview);
+        TextView confirmText = alertDialogView.findViewById(R.id.dialog_expense_confirmdelete_textview);
         confirmText.setText("Are you sure you wish to delete \"" + expense.getTitle() + "?\"");
 
         confirmDeleteDialog.setCancelable(true);
@@ -82,8 +88,10 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //showToastMessage("Expense deleted!");
+                Log.v(TAG, "deleteExpense confirmed!");
                 expensesViewModel.deleteItem(expense);
-                new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(expense.getAccountId(), expense.getDepositOrDeduct(), expense.getAmount()));
+                if (!(expense.getIsFirstOccurrence() && expense.getIsRecurring()))
+                    new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(expense.getAccountId(), expense.getDepositOrDeduct(), expense.getAmount()));
                 dialogInterface.dismiss();
             }
         });
@@ -91,13 +99,14 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
         confirmDeleteDialog.setNegativeButton("Cancel", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                Log.v(TAG, "deleteExpense canceled!");
                 dialogInterface.dismiss();
             }
         });
         confirmDeleteDialog.show();
     }
 
-    private void editAccount() {
+    private void editExpense() {
         EditExpenseDialog editExpenseDialog = new EditExpenseDialog(activity, expense);
         editExpenseDialog.show();
     }
