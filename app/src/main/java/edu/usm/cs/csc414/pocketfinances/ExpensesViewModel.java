@@ -27,7 +27,7 @@ public class ExpensesViewModel extends AndroidViewModel {
         expensesList = financesDatabase.getExpenseDao().getAllExpenses();
     }
 
-    public ExpensesViewModel(Application application, boolean getRecurring, @Nullable Calendar currentTime) {
+    public ExpensesViewModel(Application application, boolean getRecurring, @Nullable Calendar currentTime, @Nullable Boolean before) {
         super(application);
 
         financesDatabase = FinancesDatabase.getDatabase(this.getApplication());
@@ -35,8 +35,13 @@ public class ExpensesViewModel extends AndroidViewModel {
         if (getRecurring) {
 
             if (currentTime != null) {
-                Log.v(TAG, "Querying the database for parent recurring expenses with nextOcurrence before current time.");
-                expensesList = financesDatabase.getExpenseDao().getAllRecurringExpensesBeforeDate(currentTime.getTimeInMillis());
+                if (before != null && before) {
+                    Log.v(TAG, "Querying the database for parent recurring expenses with nextOcurrence before current time.");
+                    expensesList = financesDatabase.getExpenseDao().getAllRecurringExpensesBeforeDate(currentTime.getTimeInMillis());
+                } else {
+                    Log.v(TAG, "Querying the database for parent recurring expenses with nextOcurrence after current time.");
+                    expensesList = financesDatabase.getExpenseDao().getAllRecurringExpensesAfterDate(currentTime.getTimeInMillis());
+                }
             }
             else {
                 Log.v(TAG, "Querying the database for parent recurring expenses.");

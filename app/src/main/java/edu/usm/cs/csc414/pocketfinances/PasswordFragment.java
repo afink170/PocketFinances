@@ -21,7 +21,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.Arrays;
 
-public class PasswordFragment extends Fragment {
+public class PasswordFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "PasswordFragment";
 
@@ -40,6 +40,8 @@ public class PasswordFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v(TAG, "Creating PasswordFragment.");
+
         View view = inflater.inflate(R.layout.fragment_password, container, false);
 
         sharedPrefs = new CustomSharedPreferences(getContext());
@@ -68,7 +70,18 @@ public class PasswordFragment extends Fragment {
         else
             fingerprintBtn.setVisibility(View.VISIBLE);
 
-        setUiListeners();
+        btn0.setOnClickListener(this);
+        btn1.setOnClickListener(this);
+        btn2.setOnClickListener(this);
+        btn3.setOnClickListener(this);
+        btn4.setOnClickListener(this);
+        btn5.setOnClickListener(this);
+        btn6.setOnClickListener(this);
+        btn7.setOnClickListener(this);
+        btn8.setOnClickListener(this);
+        btn9.setOnClickListener(this);
+        backBtn.setOnClickListener(this);
+        fingerprintBtn.setOnClickListener(this);
 
         input0.setText("");
         input1.setText("");
@@ -102,8 +115,8 @@ public class PasswordFragment extends Fragment {
             // check whether it matches saved password hash
             if (Arrays.equals(checkHash, savedHash)) {
                 // if correct password, launch main activity
-                Intent mainActivityIntent = new Intent(parentActivity, MainActivity.class);
-                startActivity(mainActivityIntent);
+                Intent splashActivityIntent = new Intent(parentActivity, SplashActivity.class);
+                startActivity(splashActivityIntent);
                 parentActivity.finish();
 
             }
@@ -127,265 +140,92 @@ public class PasswordFragment extends Fragment {
     }
 
 
-    private void setUiListeners() {
-        btn0.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '0';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '0';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '0';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '0';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
+    @Override
+    public void onClick(View view) {
 
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '1';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '1';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '1';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '1';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
+        switch(view.getId()) {
+            case R.id.fragment_password_button0:
+                handleNumberClick('0');
+                break;
+            case R.id.fragment_password_button1:
+                handleNumberClick('1');
+                break;
+            case R.id.fragment_password_button2:
+                handleNumberClick('2');
+                break;
+            case R.id.fragment_password_button3:
+                handleNumberClick('3');
+                break;
+            case R.id.fragment_password_button4:
+                handleNumberClick('4');
+                break;
+            case R.id.fragment_password_button5:
+                handleNumberClick('5');
+                break;
+            case R.id.fragment_password_button6:
+                handleNumberClick('6');
+                break;
+            case R.id.fragment_password_button7:
+                handleNumberClick('7');
+                break;
+            case R.id.fragment_password_button8:
+                handleNumberClick('8');
+                break;
+            case R.id.fragment_password_button9:
+                handleNumberClick('9');
+                break;
+            case R.id.fragment_password_button_back:
+                handleBackButtonClick();
+                break;
+            case R.id.fragment_password_button_fingerprint:
+                handleFingerprintButtonClicked();
+                break;
+            default:
+                break;
+        }
+    }
 
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '2';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '2';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '2';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '2';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
+    private void handleNumberClick(char number) {
+        if (input[0] == ' ') {
+            input[0] = number;
+            input0.setText("*");
+        }
+        else if (input[1] == ' ') {
+            input[1] = number;
+            input1.setText("*");
+        }
+        else if (input[2] == ' ') {
+            input[2] = number;
+            input2.setText("*");
+        }
+        else if (input[3] == ' ') {
+            input[3] = number;
+            input3.setText("*");
+            authenticatePin(input);
+        }
+    }
 
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '3';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '3';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '3';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '3';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
+    private void handleBackButtonClick() {
+        if (! (input[2] == ' ')) {
+            input[2] = ' ';
+            input2.setText("");
+        }
+        else if (! (input[1] == ' ')) {
+            input[1] = ' ';
+            input1.setText("");
+        }
+        else if (! (input[0] == ' ')) {
+            input[0] = ' ';
+            input0.setText("");
+        }
+    }
 
-        btn4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '4';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '4';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '4';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '4';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
-
-        btn5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '5';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '5';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '5';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '5';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
-
-        btn6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '6';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '6';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '6';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '6';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
-
-        btn7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '7';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '7';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '7';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '7';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
-
-        btn8.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '8';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '8';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '8';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '8';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
-
-        btn9.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '9';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '9';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '9';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '9';
-                    input3.setText("*");
-                    authenticatePin(input);
-                }
-            }
-        });
-
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (! (input[2] == ' ')) {
-                    input[2] = ' ';
-                    input2.setText("");
-                }
-                else if (! (input[1] == ' ')) {
-                    input[1] = ' ';
-                    input1.setText("");
-                }
-                else if (! (input[0] == ' ')) {
-                    input[0] = ' ';
-                    input0.setText("");
-                }
-            }
-        });
-
-        fingerprintBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (sharedPrefs.getFingerprintEnabled()) {
-                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    //fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-                    fragmentTransaction.replace(R.id.activity_password_framelayout, new FingerprintFragment())
-                            .commit();
-                }
-            }
-        });
+    private void handleFingerprintButtonClicked() {
+        if (sharedPrefs.getFingerprintEnabled()) {
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            //fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+            fragmentTransaction.replace(R.id.activity_password_framelayout, new FingerprintFragment())
+                    .commit();
+        }
     }
 }

@@ -21,12 +21,6 @@ public class WelcomeFragment4Security extends Fragment {
         Log.d(TAG, "Attempting to create WelcomeFragment4.");
         View view = inflater.inflate(R.layout.fragment_welcome_4_security, container, false);
 
-        WelcomeFragment4SecurityEnter enterPasswordFragment = new WelcomeFragment4SecurityEnter();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-        fragmentTransaction.replace(R.id.activity_welcome_framelayout, enterPasswordFragment).commit();
-
-
         return view;
     }
 }

@@ -41,7 +41,7 @@ public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
                 // Initialize the ViewModel
                 viewModel = ViewModelProviders.of(activity,
                         new ExpensesViewModelFactory(activity.getApplication(),
-                                true, Calendar.getInstance())).get(ExpensesViewModel.class);
+                                true, Calendar.getInstance(), true)).get(ExpensesViewModel.class);
             }
             else {
                 Log.e(TAG, "Context is null!");
@@ -139,7 +139,7 @@ public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
             }
         }
         else
-            Log.e(TAG, "No recurring expenses found!");
+            Log.i(TAG, "No new recurring expenses found!");
 
         //viewModel.getExpensesList().removeObservers(activity);
         Log.i(TAG, "Add recurring expenses task complete!");

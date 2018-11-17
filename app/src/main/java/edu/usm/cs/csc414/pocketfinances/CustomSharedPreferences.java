@@ -20,14 +20,17 @@ public class CustomSharedPreferences {
     private static final String TAG = "CustomSharedPrefs";
 
     private static final String SHARED_PREFS = "shared_prefs";
+    private static final String PREFS_VERSION_CODE = "version_code";
     private static final String PREFS_DEFAULT_ACCOUNT = "default_account";
     private static final String PREFS_DEFAULT_IS_ALL_ACCOUNTS = "default_is_all";
     private static final String PREFS_PIN_HASH = "pin_hash";
+    private static final String PREFS_TEMP_PIN_HASH = "temp_pin_hash";
     private static final String PREFS_SALT = "salt";
     private static final String PREFS_FIRST_RUN = "is_first_run";
     private static final String PREFS_PASSWORD_ENABLED = "password_enabled";
     private static final String PREFS_ENCRYPT_KEY = "encrypt_key";
     private static final String PREFS_FINGERPRINT_ENABLED = "fingerprint_enabled";
+    private static final String PREFS_ACTIVITY_BACKGROUND = "activity_background";
 
     private static final String KEYSTORE_ENCRYPT_ALIAS = "encrypt_alias";
 
@@ -45,13 +48,47 @@ public class CustomSharedPreferences {
         this.onSharedPreferenceChangeListener = onSharedPreferenceChangeListener;
     }
 
+
+    /**
+     * Clears all data from shared preferences and resets to default
+     */
+    public void clearSharedPreferences() {
+        sharedPrefs.edit().clear().apply();
+    }
+
+
+    /**
+     * Gets the version code of the app.
+     * Used for handling app updates.
+     *
+     * @return The integer version code of the app as of the last time it was opened.
+     */
+    public int getVersionCode() {
+        return sharedPrefs.getInt(PREFS_VERSION_CODE, 1);
+    }
+
+
+    /**
+     * Stores the version code of the app in shared preferences
+     *
+     * @param version The integer version code (not the version name) of the app
+     */
+    public void setVersionCode(int version) {
+        sharedPrefs.edit().putInt(PREFS_VERSION_CODE, version).apply();
+    }
+
     /**
      * Gets the ID of the current default bank account.
+     * If ID is -1 (i.e. if there is not one set), then it will default to all account balances
      *
      * @return The ID of the current default bank account, or -1 if there is no default set
      */
     public int getDefaultAccountId() {
-        return sharedPrefs.getInt(PREFS_DEFAULT_ACCOUNT, -1);
+        int id = sharedPrefs.getInt(PREFS_DEFAULT_ACCOUNT, -1);
+
+        if (id == -1) setDefaultIsAllAccounts(true);
+
+        return id;
     }
 
 
@@ -61,7 +98,37 @@ public class CustomSharedPreferences {
      * @param defaultAccountId Integer value of the ID of the new default bank account
      */
     public void setDefaultAccountId(int defaultAccountId) {
+
+        if (defaultAccountId != -1) setDefaultIsAllAccounts(false);
+
         sharedPrefs.edit().putInt(PREFS_DEFAULT_ACCOUNT, defaultAccountId).apply();
+    }
+
+
+    /**
+     * Gets whether the home fragment should display the sum of all account balances as the balance.
+     *
+     * @return True if total of account balances should be displayed, false otherwise.
+     */
+    public boolean getDefaultIsAllAccounts() {
+
+        boolean isAllAccounts = sharedPrefs.getBoolean(PREFS_DEFAULT_IS_ALL_ACCOUNTS, false);
+
+        if (isAllAccounts) setDefaultAccountId(-1);
+
+        return isAllAccounts;
+    }
+
+
+    /**
+     *
+     * @param isAllAccounts
+     */
+    public void setDefaultIsAllAccounts(boolean isAllAccounts) {
+
+        if (isAllAccounts) setDefaultAccountId(-1);
+
+        sharedPrefs.edit().putBoolean(PREFS_DEFAULT_IS_ALL_ACCOUNTS, isAllAccounts).apply();
     }
 
 
@@ -86,6 +153,30 @@ public class CustomSharedPreferences {
     public void setPinHash(byte[] hash) {
         String hashString = Base64.encodeToString(hash, Base64.DEFAULT);
         sharedPrefs.edit().putString(PREFS_PIN_HASH, hashString).apply();
+    }
+
+
+    /**
+     * Gets the hash of the temporary chosen PIN for setting a new PIN.
+     * The hash is stored as a base 64 encoded String but is converted to a byte array before being returned.
+     *
+     * @return The byte array hash of the PIN
+     */
+    public byte[] getTempPinHash() {
+        String hashString = sharedPrefs.getString(PREFS_TEMP_PIN_HASH, "");
+        return Base64.decode(hashString, Base64.DEFAULT);
+    }
+
+
+    /**
+     * Stores the hash of the temporary chosen PIN for setting a new PIN in shared preferences.
+     * Stores the byte array hash as a base 64 encoded String.
+     *
+     * @param hash The byte array hash of the chosen PIN
+     */
+    public void setTempPinHash(byte[] hash) {
+        String hashString = Base64.encodeToString(hash, Base64.DEFAULT);
+        sharedPrefs.edit().putString(PREFS_TEMP_PIN_HASH, hashString).apply();
     }
 
 
@@ -236,5 +327,25 @@ public class CustomSharedPreferences {
      */
     public void setFingerprintEnabled(boolean enabled) {
         sharedPrefs.edit().putBoolean(PREFS_FINGERPRINT_ENABLED, enabled).apply();
+    }
+
+
+    /**
+     * Gets the resource ID of the chosen background for the app.
+     *
+     * @return Integer ID of the background.
+     */
+    public int getActivityBackground() {
+        return sharedPrefs.getInt(PREFS_ACTIVITY_BACKGROUND, R.drawable.background_dark);
+    }
+
+
+    /**
+     * Stores the resource ID of the chosen background for the app in shared preferences.
+     *
+     * @param resource Integer ID of the background.
+     */
+    public void setActivityBackground(int resource) {
+        sharedPrefs.edit().putInt(PREFS_ACTIVITY_BACKGROUND, resource).apply();
     }
 }

@@ -11,6 +11,8 @@ import android.util.Log;
 import com.commonsware.cwac.saferoom.SQLCipherUtils;
 import com.commonsware.cwac.saferoom.SafeHelperFactory;
 
+import java.io.File;
+
 
 @Database(entities = { BankAccount.class, Expense.class },
         version = 3,
@@ -43,6 +45,26 @@ public abstract class FinancesDatabase extends RoomDatabase {
 
         return INSTANCE;
     }
+
+
+    public static void deleteDatabase(Context context) {
+        File db = context.getDatabasePath("finances_db");
+        if (db.delete())
+            System.out.println("Database deleted");
+        else
+            System.out.println("Failed to delete database");
+
+        /*
+        File journal = new File(databases, databaseName + "-journal");
+        if (journal.exists()) {
+            if (journal.delete())
+                System.out.println("Database journal deleted");
+            else
+                System.out.println("Failed to delete database journal");
+        }
+        */
+    }
+
 
 
     // Define migration operations for migrating database from one version to another

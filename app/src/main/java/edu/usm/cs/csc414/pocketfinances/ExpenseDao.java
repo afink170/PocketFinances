@@ -36,9 +36,12 @@ public interface ExpenseDao {
     @Query("SELECT * FROM Expense WHERE ((NOT is_recurring) OR (NOT is_first_occurrence)) ORDER BY date DESC")
     LiveData<List<Expense>> getAllExpenses();
 
-    @Query("SELECT * FROM Expense WHERE is_recurring AND is_first_occurrence")
+    @Query("SELECT * FROM Expense WHERE is_recurring AND is_first_occurrence ORDER BY date DESC")
     LiveData<List<Expense>> getAllRecurringExpenses();
 
     @Query("SELECT * FROM Expense WHERE is_recurring AND is_first_occurrence AND next_occurrence < :now")
     LiveData<List<Expense>> getAllRecurringExpensesBeforeDate(long now);
+
+    @Query("SELECT * FROM Expense WHERE is_recurring AND is_first_occurrence AND next_occurrence >= :now ORDER BY next_occurrence ASC")
+    LiveData<List<Expense>> getAllRecurringExpensesAfterDate(long now);
 }

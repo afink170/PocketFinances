@@ -16,6 +16,7 @@ public class ExpensesViewModelFactory extends ViewModelProvider.NewInstanceFacto
     private ExpenseCategory expenseCategory;
     private Boolean onlyRecurringExpenses;
     private Calendar currentTime;
+    private Boolean before;
 
 
     public ExpensesViewModelFactory(Application application, @Nullable Integer accountId, @Nullable ExpenseCategory expenseCategory) {
@@ -24,10 +25,11 @@ public class ExpensesViewModelFactory extends ViewModelProvider.NewInstanceFacto
         this.expenseCategory = expenseCategory;
     }
 
-    public ExpensesViewModelFactory(Application application, boolean getRecurringExpensesOnly, @Nullable Calendar currentTime) {
+    public ExpensesViewModelFactory(Application application, boolean getRecurringExpensesOnly, @Nullable Calendar currentTime, @Nullable Boolean before) {
         this.application = application;
         this.onlyRecurringExpenses = getRecurringExpensesOnly;
         this.currentTime = currentTime;
+        this.before = before;
     }
 
 
@@ -35,7 +37,7 @@ public class ExpensesViewModelFactory extends ViewModelProvider.NewInstanceFacto
     public <T extends ViewModel> T create(Class<T> modelClass) {
 
         if(onlyRecurringExpenses != null)
-            return (T) new ExpensesViewModel(application, onlyRecurringExpenses, currentTime);
+            return (T) new ExpensesViewModel(application, onlyRecurringExpenses, currentTime, before);
 
         return (T) new ExpensesViewModel(application, accountId, expenseCategory);
     }

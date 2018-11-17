@@ -1,5 +1,6 @@
 package edu.usm.cs.csc414.pocketfinances;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
@@ -9,7 +10,10 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
+import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.spongycastle.crypto.params.KeyParameter;
 
 
 public class PasswordActivity extends AppCompatActivity {
@@ -20,15 +24,24 @@ public class PasswordActivity extends AppCompatActivity {
 
     // Declare Ui elements
     FrameLayout fragmentHolder;
+    ImageView background;
 
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Redirect user to different starting activity if necessary
+        handleStartingActivity();
+
+
         setContentView(R.layout.activity_password);
 
         fragmentHolder = findViewById(R.id.activity_password_framelayout);
+        background = findViewById(R.id.activity_password_background);
+
+        background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
 
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -58,12 +71,6 @@ public class PasswordActivity extends AppCompatActivity {
             Log.d(TAG, "Soft key bar height: " + softKeyBarHeight);
 
             fragmentHolder.setPadding(0,0,0, softKeyBarHeight);
-            /*
-            GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
-            layoutParams = (GridLayout.LayoutParams) gridLayout.getLayoutParams();
-            layoutParams.bottomMargin += softKeyBarHeight;
-            gridLayout.setLayoutParams(layoutParams);
-            */
 
         } catch(Exception e) {
             Log.e(TAG, "Error in checking presence of soft keys and adapting UI accordingly.", e);
@@ -78,5 +85,26 @@ public class PasswordActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
         int realHeight = metrics.heightPixels;
         return realHeight - usableHeight;
+    }
+
+    private void handleStartingActivity() {
+
+
+        //------------------------ INIT SHARED PREFERENCES -----------------------------
+        // declare and initialize shared preferences
+        CustomSharedPreferences sharedPrefs = new CustomSharedPreferences(this);
+
+        if (sharedPrefs.getIsFirstRun()) {
+            // Launch WelcomeActivity, which walks the user through the app and allows them to set up basic settings/features
+            Intent intent = new Intent(this, WelcomeActivity.class);
+            startActivity(intent);
+            this.finish();
+        }
+        else if (!sharedPrefs.getPasswordEnabled()) {
+            // Launch MainActivity
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            this.finish();
+        }
     }
 }

@@ -43,25 +43,12 @@ public class AccountsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "Attempting to create HomeFragment");
+        Log.d(TAG, "Attempting to create AccountsFragment.");
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
 
         // Initialize UI elements for fragment
         titleText = view.findViewById(R.id.fragment_accounts_title_textview);
         addAccountBtn = view.findViewById(R.id.fragment_accounts_add_btn);
-
-
-        try {
-            // Initialize custom font from resource
-            FONT_WALKWAY = Typeface.createFromAsset(getActivity().getAssets(), getString(R.string.font_walkway_black));
-
-            // Set the font for UI elements to custom font
-            titleText.setTypeface(FONT_WALKWAY);
-        }
-        catch (Exception e) {
-            Log.e(TAG, "Unable to set font of application text.", e);
-        }
-        Log.d(TAG, "Font of UI text successfully set.");
 
 
         // Initialize the RecyclerView for holding the list of accounts

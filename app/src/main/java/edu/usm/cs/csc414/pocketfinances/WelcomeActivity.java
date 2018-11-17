@@ -1,18 +1,22 @@
 package edu.usm.cs.csc414.pocketfinances;
 
+import android.app.KeyguardManager;
 import android.content.Intent;
+import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+@SuppressWarnings("deprecation")
 public class WelcomeActivity extends AppCompatActivity {
 
     private static final String TAG = "WelcomeActivity";
@@ -20,6 +24,7 @@ public class WelcomeActivity extends AppCompatActivity {
     FrameLayout fragmentHolderLayout;
     TextView nextButton;
     FragmentTransaction fragmentTransaction;
+    ImageView background;
 
     private int counter = 0;
 
@@ -33,6 +38,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         fragmentHolderLayout = findViewById(R.id.activity_welcome_framelayout);
         nextButton = findViewById(R.id.activity_welcome_next_textview);
+        background = findViewById(R.id.activity_welcome_background);
+
+        background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
 
         // Set bottom padding to the layout so that any present soft keys don't overlap the nav bar
         setBottomPadding();
@@ -48,55 +56,72 @@ public class WelcomeActivity extends AppCompatActivity {
 
 
     private void setListeners() {
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                counter++;
+        nextButton.setOnClickListener(view -> {
+            counter++;
 
-                switch (counter) {
-                    case 1:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-                        nextButton.setText(getString(R.string.continue_text));
-                        fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment2Accounts()).commit();
-                        break;
-                    case 2:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-                        nextButton.setText(getString(R.string.continue_text));
-                        fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment3Budget()).commit();
-                        break;
-                    case 3:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-                        nextButton.setText(R.string.skip_text);
-                        fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment4Security()).commit();
-                        break;
-                    case 4:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-                        nextButton.setText(getString(R.string.finish_text));
-                        Bundle bundle = new Bundle();
-                        bundle.putString("prevPage", "skipped");
-                        WelcomeFragment5Done doneFragment = new WelcomeFragment5Done();
-                        doneFragment.setArguments(bundle);
-                        fragmentTransaction.replace(fragmentHolderLayout.getId(), doneFragment).commit();
-                        break;
-                    case 5:
-                        Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                        break;
-                    default:
-                        break;
-                }
+            switch (counter) {
+                case 1:
+                    fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+                    nextButton.setText(getString(R.string.continue_text));
+                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment2Accounts()).commit();
+                    break;
+                case 2:
+                    fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+                    nextButton.setText(getString(R.string.continue_text));
+                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment3Budget()).commit();
+                    break;
+                case 3:
+                    fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+                    nextButton.setText(R.string.continue_text);
+                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment4Security()).commit();
+                    break;
+                case 4:
+                    fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+                    nextButton.setText(R.string.skip_text);
+                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment4SecurityEnter()).commit();
+                    break;
+                case 5:
+                    fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+                    nextButton.setText(R.string.continue_text);
+                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment4SecurityFingerprint()).commit();
+                    break;
+                case 6:
+                    fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+                    nextButton.setText(getString(R.string.finish_text));
+                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment5Done()).commit();
+                    break;
+                case 7:
+                    Intent intent = new Intent(getBaseContext(), SplashActivity.class);
+                    startActivity(intent);
+                    finish();
+                    break;
+                default:
+                    break;
             }
         });
     }
 
-    public void setNextButtonToFinish() {
-        nextButton.setText(getString(R.string.finish_text));
-        counter++;
+    public void jumpToDone() {
+        counter = 5;
+        nextButton.performClick();
+    }
+
+    public void jumpToFingerprint() {
+
+        if (canUseFingerprint()) {
+            counter = 4;
+            nextButton.performClick();
+            return;
+        }
+
+        Log.i(TAG, "Fingerprint scanner not available for use.  Skipping to DoneFragment");
+        jumpToDone();
     }
 
 
@@ -121,5 +146,31 @@ public class WelcomeActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
         int realHeight = metrics.heightPixels;
         return realHeight - usableHeight;
+    }
+
+    private boolean canUseFingerprint() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return false;
+
+        FingerprintManager fingerprintManager = (FingerprintManager) getApplicationContext().getSystemService(FINGERPRINT_SERVICE);
+
+        if (fingerprintManager == null)
+            return false;
+
+        if (!fingerprintManager.isHardwareDetected())
+            return false;
+
+        if (!fingerprintManager.hasEnrolledFingerprints())
+            return false;
+
+        KeyguardManager keyguardManager = (KeyguardManager) getApplicationContext().getSystemService(KEYGUARD_SERVICE);
+
+        if (keyguardManager == null)
+            return false;
+
+        if (!keyguardManager.isKeyguardSecure())
+            return false;
+
+        return true;
     }
 }

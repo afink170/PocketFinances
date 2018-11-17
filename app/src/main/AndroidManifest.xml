@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="edu.usm.cs.csc414.pocketfinances">
 
     <uses-feature
         android:name="android.hardware.fingerprint"
         android:required="false"/>
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <!-- USE_FINGERPRINT is deprecated and has been replaced with USES_BIOMETRIC.
          However, since we are ONLY supporting fingerprint, and not iris or face,
          we will still use USE_FINGERPRINT, as it works perfectly fine. -->
-    <uses-permission
-        android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+
 
     <application
         android:name=".AppClass"
+        android:appCategory="productivity"
         android:allowClearUserData="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_adaptive"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_adaptive_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        android:theme="@style/AppTheme"
+        tools:targetApi="o">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
+
+        <activity android:name=".PasswordActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PasswordActivity">
-        </activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".WelcomeActivity" />
+        <activity android:name=".SplashActivity" />
     </application>
 
 </manifest>

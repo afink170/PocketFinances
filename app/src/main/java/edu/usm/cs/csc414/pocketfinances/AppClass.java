@@ -2,6 +2,7 @@ package edu.usm.cs.csc414.pocketfinances;
 
 import android.app.Application;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -21,12 +22,6 @@ public class AppClass extends Application {
 
     private static final String DB_NAME = "finances_db";
     private static final String TAG = "AppClass";
-
-    // Constants for testing of password activity and welcome activity
-    private static final boolean TESTING_WELCOME_ACTIVITY = false;
-    private static final boolean TESTING_PASSWORD_ACTIVITY = true;
-    private static final boolean TESTING_FINGERPRINT_ACTIVITY = true;
-    private static final char[] DEFAULT_TEST_PASSWORD = {'0', '0', '0', '0'};
 
 
     /**
@@ -51,22 +46,36 @@ public class AppClass extends Application {
 
 
 
-
-
-
-
         //------------------------ INIT SHARED PREFERENCES -----------------------------
         // declare and initialize shared preferences
         CustomSharedPreferences sharedPrefs = new CustomSharedPreferences(this);
 
 
-        // TODO : Remove this once testing of PasswordActivity and WelcomeActivity is complete
-        // If testing password or welcome activity, or if actual first run, set shared preferences first run to true
-        //sharedPrefs.setIsFirstRun(TESTING_PASSWORD_ACTIVITY || TESTING_WELCOME_ACTIVITY || sharedPrefs.getIsFirstRun());
-        sharedPrefs.setFingerprintEnabled(TESTING_FINGERPRINT_ACTIVITY);
-        sharedPrefs.setPasswordEnabled(TESTING_PASSWORD_ACTIVITY);
 
 
+        //------------------------ HANDLE APP VERSION CHANGES -------------------------
+        if(sharedPrefs.getVersionCode() <= 1) {
+            // There are some breaking changes before this,
+            // so it is best to just clear the database and shared prefs
+            Log.i(TAG, "Database-breaking changes have been introduced since last update, " +
+                    "so database and shared preferences will be cleared.");
+
+            // Reset all stored preferences
+            sharedPrefs.clearSharedPreferences();
+        }
+
+
+        try {
+            @SuppressWarnings("deprecation")
+            int version = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+
+            Log.i(TAG, "Current app version code:  " + version);
+
+            sharedPrefs.setVersionCode(version);
+
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Failed to get app version!", e);
+        }
 
 
 
@@ -74,9 +83,15 @@ public class AppClass extends Application {
         // If this is the first time running
         if (sharedPrefs.getIsFirstRun()) {
 
+            sharedPrefs.setIsFirstRun(true);
+
+            // TODO : Need to perhaps find a safer way to do this?
+            FinancesDatabase.deleteDatabase(getApplicationContext());
+
             // Generate or set encryption key, then store it in sharedPrefs as an encrypted string.
             // That way, the encryption key is never stored as plain text
             sharedPrefs.generateEncryptKeyAndStore();
+
 
 
             // Number of bytes of salt
@@ -84,64 +99,13 @@ public class AppClass extends Application {
 
             byte[] salt;
 
-            if (!sharedPrefs.getIsSaltGenerated()) {
-                // Generate random salt
-                SecureRandom rng = new SecureRandom();
-                salt = rng.generateSeed(bytes);
+            // Generate random salt
+            SecureRandom rng = new SecureRandom();
+            salt = rng.generateSeed(bytes);
 
-                // Store salt in shared prefs
-                sharedPrefs.setSalt(salt);
-            } else {
-                salt = sharedPrefs.getSalt();
-            }
-
-            if (!TESTING_PASSWORD_ACTIVITY) {
-
-                // Launch WelcomeActivity, which walks the user through the app and allows them to set up basic settings/features
-                Intent intent = new Intent(this, WelcomeActivity.class);
-                startActivity(intent);
-
-            }
-            else {
-                // TODO : remove this once password feature has been tested and fixed.
-                // For password activity testing
-                try {
-
-                    // Number of iterations
-                    final int iterations = 100;
-
-
-                    byte[] pinBytes = new String(DEFAULT_TEST_PASSWORD).getBytes();
-
-                    // hash password
-                    PKCS5S2ParametersGenerator kdf1 = new PKCS5S2ParametersGenerator();
-                    kdf1.init(pinBytes, salt, iterations);
-                    byte[] savedHash = ((KeyParameter) kdf1.generateDerivedMacParameters(8 * bytes)).getKey();
-
-                    // store password hash in shared prefs
-                    sharedPrefs.setPinHash(savedHash);
-
-                    // Launch PasswordActivity
-                    Intent intent = new Intent(this, PasswordActivity.class);
-                    startActivity(intent);
-
-
-                } catch(Exception e) {
-                    Log.e(TAG, "Failed to initialize default password.");
-                }
-            }
-
-
-
+            // Store salt in shared prefs
+            sharedPrefs.setSalt(salt);
         }
-        else if (sharedPrefs.getPasswordEnabled() || TESTING_PASSWORD_ACTIVITY) {
-
-            // Launch PasswordActivity
-            Intent intent = new Intent(this, PasswordActivity.class);
-            startActivity(intent);
-
-        }
-
 
 
         //------------------------ HANDLE DATABASE ENCRYPTION STATE --------------------
@@ -180,7 +144,4 @@ public class AppClass extends Application {
             Log.e(TAG, "Failed to get database encryption state!", e);
         }
     }
-
-
-
 }

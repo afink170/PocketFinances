@@ -61,13 +61,14 @@ public class FingerprintFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v(TAG, "Attempting to create FingerprintFragment.");
+
         View view = inflater.inflate(R.layout.fragment_fingerprint, container, false);
 
         usePasswordButton = view.findViewById(R.id.fragment_fingerprint_use_password_button);
         usePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                handler.disableErrorMessages();
                 exitToPasswordFragment();
             }
         });
@@ -125,16 +126,23 @@ public class FingerprintFragment extends Fragment {
                 cryptoObject = new FingerprintManager.CryptoObject(cipher);
 
                 // Initialize the FingerprintHandler, which will start the authentication process and process the authentication events
-                handler = new FingerprintHandler(getContext(), getActivity());
+                handler = new FingerprintHandler(getContext(), getActivity(), view);
 
                 // Begin authentication
-                handler.startAuth(fingerprintManager, cryptoObject);
+                //handler.startAuth(fingerprintManager, cryptoObject);
             }
         }
 
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (handler != null && fingerprintManager != null && cryptoObject != null)
+            handler.startAuth(fingerprintManager, cryptoObject);
+    }
 
     @Override
     public void onPause() {
@@ -144,9 +152,6 @@ public class FingerprintFragment extends Fragment {
         // This is necessary because if fingerprint auth is not cancelled, other apps can't use the scanner.
         if (handler != null)
             handler.cancelAuth();
-
-        // Go ahead and return to password fragment
-        exitToPasswordFragment();
     }
 
 

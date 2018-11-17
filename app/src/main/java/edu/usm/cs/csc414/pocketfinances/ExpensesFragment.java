@@ -43,6 +43,8 @@ public class ExpensesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v(TAG, "Attempting to create ExpensesFragment.");
+
         View view = inflater.inflate(R.layout.fragment_expenses, container, false);
 
         // Initialize UI elements
@@ -63,19 +65,6 @@ public class ExpensesFragment extends Fragment {
             Log.e(TAG, "Unable to get bank account ID.", e);
             getActivity().getSupportFragmentManager().popBackStack();
         }
-
-        /*
-        try {
-            // Initialize custom font from resource
-            FONT_WALKWAY = Typeface.createFromAsset(getActivity().getAssets(), getString(R.string.font_walkway_black));
-
-            // Set the font for UI elements to custom font
-            titleTextView.setTypeface(FONT_WALKWAY);
-        } catch(Exception e) {
-            Log.e(TAG, "Unable to set font of application text.");
-        }
-        Log.d(TAG, "Font of UI text successfully set.");
-        */
 
 
         // Initialize the RecyclerView for holding the list of accounts

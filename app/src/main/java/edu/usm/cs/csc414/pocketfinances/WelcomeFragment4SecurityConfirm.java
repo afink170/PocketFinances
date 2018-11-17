@@ -19,7 +19,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 import java.util.Arrays;
 
 
-public class WelcomeFragment4SecurityConfirm extends Fragment {
+public class WelcomeFragment4SecurityConfirm extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "WelcomeFragment4";
 
@@ -57,266 +57,24 @@ public class WelcomeFragment4SecurityConfirm extends Fragment {
 
         sharedPrefs = new CustomSharedPreferences(getContext());
 
+        btn0.setOnClickListener(this);
+        btn1.setOnClickListener(this);
+        btn2.setOnClickListener(this);
+        btn3.setOnClickListener(this);
+        btn4.setOnClickListener(this);
+        btn5.setOnClickListener(this);
+        btn6.setOnClickListener(this);
+        btn7.setOnClickListener(this);
+        btn8.setOnClickListener(this);
+        btn9.setOnClickListener(this);
+        backBtn.setOnClickListener(this);
+
         input0.setText("");
         input1.setText("");
         input2.setText("");
         input3.setText("");
 
-        setUiListeners();
-
         return view;
-    }
-
-
-
-    private void setUiListeners() {
-        btn0.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '0';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '0';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '0';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '0';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '1';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '1';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '1';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '1';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '2';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '2';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '2';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '2';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '3';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '3';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '3';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '3';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '4';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '4';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '4';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '4';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '5';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '5';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '5';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '5';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '6';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '6';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '6';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '6';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '7';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '7';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '7';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '7';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn8.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '8';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '8';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '8';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '8';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        btn9.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (input[0] == ' ') {
-                    input[0] = '9';
-                    input0.setText("*");
-                }
-                else if (input[1] == ' ') {
-                    input[1] = '9';
-                    input1.setText("*");
-                }
-                else if (input[2] == ' ') {
-                    input[2] = '9';
-                    input2.setText("*");
-                }
-                else if (input[3] == ' ') {
-                    input[3] = '9';
-                    input3.setText("*");
-                    processPin(input);
-                }
-            }
-        });
-
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (! (input[2] == ' ')) {
-                    input[2] = ' ';
-                    input2.setText("");
-                }
-                else if (! (input[1] == ' ')) {
-                    input[1] = ' ';
-                    input1.setText("");
-                }
-                else if (! (input[0] == ' ')) {
-                    input[0] = ' ';
-                    input0.setText("");
-                }
-            }
-        });
     }
 
 
@@ -339,23 +97,14 @@ public class WelcomeFragment4SecurityConfirm extends Fragment {
             byte[] userHash = ((KeyParameter) kdf.generateDerivedMacParameters(8 * numBytes)).getKey();
             pin = null;
 
-            final byte[] firstInputHash = sharedPrefs.getPinHash();
+            final byte[] firstInputHash = sharedPrefs.getTempPinHash();
 
             if(Arrays.equals(firstInputHash, userHash)) {
 
                 sharedPrefs.setPasswordEnabled(true);
+                sharedPrefs.setPinHash(firstInputHash);
 
-                Bundle bundle = new Bundle();
-                bundle.putString("prevPage", "passwordConfirm");
-
-                //showToastMessage(clickedAccount.getAccountName() + " clicked!");
-                WelcomeFragment5Done doneFragment = new WelcomeFragment5Done();
-                doneFragment.setArguments(bundle);
-
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-                fragmentTransaction.replace(R.id.activity_welcome_framelayout, doneFragment)
-                        .commit();
+                ((WelcomeActivity)getActivity()).jumpToFingerprint();
             }
             else {
                 sharedPrefs.resetPinHash();
@@ -363,7 +112,8 @@ public class WelcomeFragment4SecurityConfirm extends Fragment {
                 WelcomeFragment4SecurityEnter retryFragment = new WelcomeFragment4SecurityEnter();
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(R.animator.slide_right_left_in, R.animator.slide_right_left_out);
-                fragmentTransaction.replace(R.id.activity_welcome_framelayout, retryFragment).commit();
+                fragmentTransaction.replace(R.id.activity_welcome_framelayout, retryFragment)
+                        .commit();
             }
 
         }catch (Exception e) {
@@ -371,6 +121,85 @@ public class WelcomeFragment4SecurityConfirm extends Fragment {
         }
 
     }
+
+
+    @Override
+    public void onClick(View view) {
+
+        switch(view.getId()) {
+            case R.id.fragment_password_confirm_button0:
+                handleNumberClick('0');
+                break;
+            case R.id.fragment_password_confirm_button1:
+                handleNumberClick('1');
+                break;
+            case R.id.fragment_password_confirm_button2:
+                handleNumberClick('2');
+                break;
+            case R.id.fragment_password_confirm_button3:
+                handleNumberClick('3');
+                break;
+            case R.id.fragment_password_confirm_button4:
+                handleNumberClick('4');
+                break;
+            case R.id.fragment_password_confirm_button5:
+                handleNumberClick('5');
+                break;
+            case R.id.fragment_password_confirm_button6:
+                handleNumberClick('6');
+                break;
+            case R.id.fragment_password_confirm_button7:
+                handleNumberClick('7');
+                break;
+            case R.id.fragment_password_confirm_button8:
+                handleNumberClick('8');
+                break;
+            case R.id.fragment_password_confirm_button9:
+                handleNumberClick('9');
+                break;
+            case R.id.fragment_password_confirm_button_back:
+                handleBackButtonClick();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void handleNumberClick(char number) {
+        if (input[0] == ' ') {
+            input[0] = number;
+            input0.setText("*");
+        }
+        else if (input[1] == ' ') {
+            input[1] = number;
+            input1.setText("*");
+        }
+        else if (input[2] == ' ') {
+            input[2] = number;
+            input2.setText("*");
+        }
+        else if (input[3] == ' ') {
+            input[3] = number;
+            input3.setText("*");
+            processPin(input);
+        }
+    }
+
+    private void handleBackButtonClick() {
+        if (! (input[2] == ' ')) {
+            input[2] = ' ';
+            input2.setText("");
+        }
+        else if (! (input[1] == ' ')) {
+            input[1] = ' ';
+            input1.setText("");
+        }
+        else if (! (input[0] == ' ')) {
+            input[0] = ' ';
+            input0.setText("");
+        }
+    }
+
 
     private void showToastMessage(String message) {
         Toast.makeText(getActivity().getBaseContext(), message,

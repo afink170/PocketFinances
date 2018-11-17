@@ -42,23 +42,12 @@ public class RecurringExpensesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v(TAG, "Attempting to create RecurringExpensesFragment.");
+
         View view = inflater.inflate(R.layout.fragment_recurring_expenses, container, false);
 
         // Initialize UI elements
         addRecurringExpenseBtn = view.findViewById(R.id.fragment_recurring_expenses_add_btn);
-
-        /*
-        try {
-            // Initialize custom font from resource
-            FONT_WALKWAY = Typeface.createFromAsset(getActivity().getAssets(), getString(R.string.font_walkway_black));
-
-            // Set the font for UI elements to custom font
-            titleTextView.setTypeface(FONT_WALKWAY);
-        } catch(Exception e) {
-            Log.e(TAG, "Unable to set font of application text.");
-        }
-        Log.d(TAG, "Font of UI text successfully set.");
-        */
 
         // Initialize the RecyclerView for holding the list of accounts
         recyclerView = view.findViewById(R.id.fragment_recurring_expenses_recyclerview);
@@ -67,9 +56,7 @@ public class RecurringExpensesFragment extends Fragment {
         // Initialize the ViewModel
         viewModel = ViewModelProviders.of(this,
                 new ExpensesViewModelFactory(this.getActivity().getApplication(),
-                        true, null)).get(ExpensesViewModel.class);
-
-
+                        true, null, null)).get(ExpensesViewModel.class);
 
 
         // Set the LayoutManager to be the LinearLayoutManager
@@ -79,8 +66,6 @@ public class RecurringExpensesFragment extends Fragment {
         sectionAdapter = new SectionedRecyclerViewAdapter();
 
         recyclerView.setAdapter(sectionAdapter);
-
-
 
 
         addRecurringExpenseBtn.setOnClickListener(new View.OnClickListener() {
@@ -161,16 +146,6 @@ public class RecurringExpensesFragment extends Fragment {
             }
         });
 
-
         return view;
-    }
-
-
-    
-
-
-    private void showToastMessage(String message) {
-        Toast.makeText(getActivity().getBaseContext(), message,
-                Toast.LENGTH_SHORT).show();
     }
 }

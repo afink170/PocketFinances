@@ -8,10 +8,14 @@ import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.CancellationSignal;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,19 +23,28 @@ import android.widget.Toast;
 @SuppressWarnings("ALL")
 public class FingerprintHandler extends FingerprintManager.AuthenticationCallback {
 
+    private static final String TAG = "FingerprintHandler";
+
     // Must use CancellationSignal whenever fingerprint scanner is no longer needed.  Otherwise, other apps will not be able to use it.
     private CancellationSignal cancellationSignal;
     private Context context;
     private FragmentActivity activity;
+    private View view;
 
     private int failCount = 0;
     private final int maxFails = 3;
-    private boolean errorMessagesEnabled = true;
+
+    private TextView messageTextView;
+    private ImageView fingerprintImageView;
 
 
-    public FingerprintHandler(Context mContext, FragmentActivity mActivity) {
-        context = mContext;
-        activity = mActivity;
+    public FingerprintHandler(Context context, FragmentActivity activity, View view) {
+        this.context = context;
+        this.activity = activity;
+        this.view = view;
+
+        messageTextView = view.findViewById(R.id.fragment_fingerprint_messagetext);
+        fingerprintImageView = view.findViewById(R.id.fragment_fingerprint_image);
     }
 
 
@@ -53,17 +66,11 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     }
 
 
-    // Method for manually disabling error message.
-    public void disableErrorMessages() {
-        errorMessagesEnabled = false;
-    }
-
 
     // is called when a fatal error has occurred.
     @Override
     public void onAuthenticationError(int errMsgId, CharSequence errString) {
-        if (errorMessagesEnabled)
-            showToastMessage("Authentication error\n" + errString);
+        Log.e(TAG, (String)errString);
     }
 
 
@@ -71,8 +78,13 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     @Override
     public void onAuthenticationFailed() {
 
-        if (errorMessagesEnabled)
-            showToastMessage("Authentication failed");
+        fingerprintImageView.setImageDrawable(activity.getDrawable(R.drawable.ic_fingerprint_red));
+        messageTextView.setTextColor(activity.getColor(R.color.colorRed));
+        messageTextView.setText("Fingerprint authentication failed!");
+
+        waitThenResetUI(2);
+
+        Log.e(TAG, "Fingerprint authentication failed!");
 
         failCount++;
 
@@ -90,8 +102,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     // is called when a non-fatal error has occurred. This method provides additional information about the error
     @Override
     public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
-        if (errorMessagesEnabled)
-            showToastMessage("Authentication help\n" + helpString);
+        Log.e(TAG, "Authentication help:  " + helpString);
     }
 
 
@@ -100,13 +111,31 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
         cancellationSignal.cancel();
 
+        Log.i(TAG, "Fingerprint recognized!");
+
+        fingerprintImageView.setImageDrawable(activity.getDrawable(R.drawable.ic_fingerprint_green));
+        messageTextView.setTextColor(activity.getColor(R.color.colorGreen));
+        messageTextView.setText("Fingerprint recognized!");
+
         // Launch MainActivity
         Intent intent = new Intent(activity, MainActivity.class);
-        context.startActivity(intent);
+        activity.startActivity(intent);
         activity.finish();
     }
 
 
+
+    private void waitThenResetUI(double seconds) {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fingerprintImageView.setImageDrawable(activity.getDrawable(R.drawable.ic_fingerprint_white));
+                messageTextView.setTextColor(activity.getColor(R.color.colorWhite));
+                messageTextView.setText(activity.getText(R.string.fingerprintauth_message_default));
+            }
+        }, (int)(seconds * 1000));
+    }
 
 
     private void showToastMessage(String message) {

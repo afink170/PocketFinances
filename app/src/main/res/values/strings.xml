@@ -14,4 +14,9 @@
     <string name="bottom_nav_item_title_accounts">Accounts</string>
     <string name="bottom_nav_item_title_recurrences">Recurrences</string>
     <string name="bottom_nav_item_title_budget">Budget</string>
+    <string name="fingerprintauth_message_default">Place finger on sensor.</string>
+    <string name="notification_duedate_builder">Due %s, %s</string>
+    <string name="fragment_welcome_4_security_text">Next, you can choose a 4-digit PIN to protect your finance data. If enabled, you will be prompted to enter your PIN whenever you launch the app. This feature is not required but is highly recommended for your security.</string>
+    <string name="fragment_welcome_5_done_text">You\'re all set! Enjoy using the app, and if you have any questions, feel free to check the FAQ\'s in the preferences page.</string>
+    <string name="fingerprint_fragment_add_text">By enabling fingerprint authentication, any fingerprint that is enrolled in the device will be able to unlock and open the app.</string>
 </resources>

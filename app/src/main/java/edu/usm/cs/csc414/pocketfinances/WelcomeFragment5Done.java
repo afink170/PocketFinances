@@ -17,22 +17,6 @@ public class WelcomeFragment5Done extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_welcome_5_done, container, false);
-
-        try {
-            String lastFragment = getArguments().getString("prevPage");
-
-            if (lastFragment == "passwordConfirm") {
-                ((WelcomeActivity)getActivity()).setNextButtonToFinish();
-            }
-        } catch(Exception e) {
-            Log.e(TAG, "Failed to get last fragment.");
-        }
-
-
-
-
-
-        return view;
+        return inflater.inflate(R.layout.fragment_welcome_5_done, container, false);
     }
 }
