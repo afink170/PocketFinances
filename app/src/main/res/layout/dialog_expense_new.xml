@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:focusableInTouchMode="true"
+    android:padding="14dp">
+
+    <EditText
+        android:id="@+id/dialog_expense_new_expensetitle"
+        android:inputType="textCapWords"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:hint="Expense Title" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expense Category: "
+            android:paddingRight="10dp"
+            android:paddingLeft="4dp"/>
+
+        <Spinner
+            android:id="@+id/dialog_expense_new_expensecategory_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/dialog_expense_new_expenseamount"
+        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="16dp"
+        android:hint="Expense Amount"/>
+
+    <LinearLayout
+        android:layout_width="162dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:padding="0dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_box">
+
+        <TextView
+            android:id="@+id/dialog_expense_new_toggledeposit"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:background="@color/colorDarkGreyTransparent"
+            android:text="Deposit"
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            android:focusable="false"/>
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="#494949" />
+
+        <TextView
+            android:id="@+id/dialog_expense_new_toggleexpense"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:background="@color/colorDarkGreyTransparent"
+            android:text="Expense"
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            android:focusable="false"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/dialog_expense_new_expensedate"
+        android:inputType="none"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="16dp"
+        android:focusableInTouchMode="false"
+        android:clickable="true"
+        android:hint="Expense Date"/>
+
+    <CheckBox
+        android:id="@+id/dialog_expense_new_expenseisrecurring"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Recurring Payment"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recurrence Rate: "
+            android:paddingRight="10dp"
+            android:paddingLeft="4dp"/>
+
+        <Spinner
+            android:id="@+id/dialog_expense_new_expenserecurrence_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bank Account: "
+            android:paddingRight="10dp"
+            android:paddingLeft="4dp"/>
+
+        <Spinner
+            android:id="@+id/dialog_expense_new_bankaccount_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="right"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/dialog_expense_new_cancel"
+            android:text="Cancel"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:clickable="true"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/dialog_expense_new_save"
+            android:text="Save"
+            android:layout_width="60dp"
+            android:layout_height="20dp"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:clickable="true"
+            android:textColor="@color/colorPrimaryDark"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

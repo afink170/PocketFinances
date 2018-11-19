@@ -1,0 +1,51 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/fragment_welcome_2_texview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:gravity="center"
+        android:scrollHorizontally="false"
+        android:text="First, you will need to add your first bank account to Pocket Finances so that you can keep track of your balance and expenses made with that account."
+        android:textColor="@color/colorWhite"
+        android:textSize="22sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_welcome_2_texview"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+    <ImageButton
+        android:id="@+id/fragment_welcome_2_newaccount_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_add_100"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:layout_marginTop="26dp"
+        android:layout_gravity="center"
+        android:contentDescription="Add New Account" />
+
+    <TextView
+        android:id="@+id/fragment_home_addexpense_caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Add New Account"
+        android:textSize="18sp"
+        android:textColor="@color/colorWhite"/>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

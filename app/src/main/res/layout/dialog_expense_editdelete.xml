@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="180dp"
+    android:layout_height="100dp"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:background="@color/dialogBackgroundColor">
+
+    <TextView
+        android:id="@+id/dialog_expense_editdelete_edit_textview"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Edit Expense"
+        android:clickable="true"
+        android:gravity="center"
+        android:background="@drawable/border_bottom"
+        android:textSize="16sp"
+        android:textColor="@color/colorWhite"/>
+
+    <TextView
+        android:id="@+id/dialog_expense_editdelete_delete_textview"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Delete Expense"
+        android:clickable="true"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/colorWhite"/>
+
+</LinearLayout>
