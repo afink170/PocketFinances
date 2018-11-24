@@ -18,10 +18,10 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.Arrays;
 
+import timber.log.Timber;
+
 
 public class WelcomeFragment4SecurityConfirm extends Fragment implements View.OnClickListener {
-
-    private static final String TAG = "WelcomeFragment4";
 
     CustomSharedPreferences sharedPrefs;
 
@@ -80,21 +80,12 @@ public class WelcomeFragment4SecurityConfirm extends Fragment implements View.On
 
     private void processPin(char[] pin) {
 
-        // number of bytes of salt
-        final int numBytes = 20;
-
-        // number of hashing iterations.
-        // The more iterations, the more secure, but worse performance
-        final int iterations = 100;
-
         // get salt and password hash from shared prefs
         final byte[] salt = sharedPrefs.getSalt();
 
         try {
             // hash user input password
-            PKCS5S2ParametersGenerator kdf = new PKCS5S2ParametersGenerator();
-            kdf.init(new String(pin).getBytes(), salt, iterations);
-            byte[] userHash = ((KeyParameter) kdf.generateDerivedMacParameters(8 * numBytes)).getKey();
+            byte[] userHash = HashingHandler.getHash(salt, new String(pin).getBytes());
             pin = null;
 
             final byte[] firstInputHash = sharedPrefs.getTempPinHash();
@@ -117,7 +108,7 @@ public class WelcomeFragment4SecurityConfirm extends Fragment implements View.On
             }
 
         }catch (Exception e) {
-            Log.e(TAG, "Failed to authenticate password.", e);
+            Timber.e(e, "Failed to authenticate password.");
         }
 
     }

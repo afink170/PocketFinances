@@ -1,9 +1,11 @@
 package edu.usm.cs.csc414.pocketfinances;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,14 +15,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
+import timber.log.Timber;
+
 // Class defining the logic for the Home Fragment.
 public class HomeFragment extends Fragment {
-    private static final String TAG = "HomeFragment";
 
     // Declare UI elements
     TextView textView1, textView2, textView3, titleTextView, balanceTextView, budgetTextView, btnCaptionTextView;
@@ -28,6 +32,8 @@ public class HomeFragment extends Fragment {
     RecyclerView notificationsRecyclerView;
 
     int defaultAccountId;
+    volatile boolean accountsExist = true;
+
     NotificationsRecyclerViewAdapter notificationsRecyclerViewAdapter;
 
     CustomSharedPreferences sharedPreferences;
@@ -38,7 +44,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate fragment from fragment_home XML
-        Log.d(TAG, "Attempting to create HomeFragment");
+        Timber.d("Attempting to create HomeFragment");
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         try {
@@ -55,33 +61,34 @@ public class HomeFragment extends Fragment {
             btnCaptionTextView = view.findViewById(R.id.fragment_home_addexpense_caption);
             notificationsRecyclerView = view.findViewById(R.id.fragment_home_notifications_recyclerview);
         } catch(Exception e) {
-            Log.e(TAG, "Unable to initialize UI elements of HomeFragment.", e);
+            Timber.e(e, "Unable to initialize UI elements of HomeFragment.");
         }
-        Log.d(TAG, "HomeFragment's UI elements successfully initialized.");
 
         budgetTextView.setText("");
 
         sharedPreferences = new CustomSharedPreferences(getContext());
         defaultAccountId = sharedPreferences.getDefaultAccountId();
 
+        setThemeColors();
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> observeAccountBalance());
+
         try {
 
-            Log.d(TAG, "Attempting to observe default account in database.");
+            Timber.d("Attempting to observe default account in database.");
             observeAccountBalance();
 
-            Log.d(TAG, "Attempting to observe expenses in database for filling the notifications list.");
+            Timber.d("Attempting to observe expenses in database for filling the notifications list.");
             observeNotifications();
 
             // Set listeners for UI elements, such as OnClick listeners for buttons
-            Log.v(TAG, "Attempting to set UI event listeners.");
+            Timber.v("Attempting to set UI event listeners.");
             setListeners();
 
         } catch(Exception e) {
-            Log.e(TAG, "Failed to set listeners and observe the database instance.", e);
+            Timber.e(e, "Failed to set listeners and observe the database instance.");
         }
 
-
-        Log.d(TAG, "View successfully created.");
         return view;
     }
 
@@ -89,35 +96,62 @@ public class HomeFragment extends Fragment {
 
     private void setListeners() {
         addExpenseBtn.setOnClickListener(view -> {
-            // Launch add new expense
-            NewExpenseDialog newExpenseDialog = new NewExpenseDialog(getActivity(), defaultAccountId);
-            newExpenseDialog.show();
+            if (accountsExist) {
+                // Launch add new expense
+                NewExpenseDialog newExpenseDialog = new NewExpenseDialog(getActivity(), defaultAccountId);
+                newExpenseDialog.show();
+            }
+            else {
+                showToastMessage("You must add an account first!");
+            }
         });
 
         settingsBtn.setOnClickListener(view -> {
             // Launch settings activity
         });
-
-        sharedPreferences.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> observeAccountBalance());
     }
 
-    public void observeAccountBalance() {
+
+    private void setThemeColors() {
+        int theme = sharedPreferences.getActivityTheme();
+
+        if (theme == CustomSharedPreferences.THEME_DARK) {
+            titleTextView.setTextColor(getResources().getColor(R.color.colorWhite));
+            addExpenseBtn.setImageResource(R.drawable.ic_add_light);
+            btnCaptionTextView.setTextColor(getResources().getColor(R.color.colorWhite));
+            settingsBtn.setImageResource(R.drawable.ic_settings_light);
+        }
+        else if (theme == CustomSharedPreferences.THEME_LIGHT) {
+            titleTextView.setTextColor(getResources().getColor(R.color.colorDarkGrey));
+            addExpenseBtn.setImageResource(R.drawable.ic_add_dark);
+            btnCaptionTextView.setTextColor(getResources().getColor(R.color.colorDarkGrey));
+            settingsBtn.setImageResource(R.drawable.ic_settings_dark);
+        }
+    }
+
+    private void observeAccountBalance() {
 
         BankAccountsViewModel accountsViewModel = new BankAccountsViewModel((getActivity().getApplication()));
 
         if (sharedPreferences.getDefaultIsAllAccounts() || defaultAccountId == -1) {
-            Log.d(TAG, "Getting the sum of the balances of all accounts.");
+            Timber.d("Getting the sum of the balances of all accounts.");
 
             accountsViewModel.getBankAccountsList().observe(this, bankAccountList -> {
                 double totalBalance = 0.0;
 
                 try {
-                    for (BankAccount account : bankAccountList) {
-                        totalBalance += account.getAccountBalance();
+                    if (bankAccountList.isEmpty()) {
+                        accountsExist = false;
+                        setListeners();
+                    }
+                    else {
+                        for (BankAccount account : bankAccountList) {
+                            totalBalance += account.getAccountBalance();
+                        }
                     }
                 }
                 catch (NullPointerException e) {
-                    Log.e(TAG, "Failed to get bank accounts list from database.", e);
+                    Timber.e(e, "Failed to get bank accounts list from database.");
                 }
 
                 if (totalBalance < 0.0) {
@@ -126,7 +160,7 @@ public class HomeFragment extends Fragment {
                 }
                 else if (totalBalance == 0.0) {
                     balanceTextView.setText(String.format(Locale.US, "$%.2f", totalBalance));
-                    balanceTextView.setTextColor(getResources().getColor(R.color.colorWhite));
+                    balanceTextView.setTextColor(getResources().getColor(R.color.colorDarkGrey));
                 }
                 else {
                     balanceTextView.setText(String.format(Locale.US, "$%.2f", totalBalance));
@@ -136,14 +170,14 @@ public class HomeFragment extends Fragment {
 
         }
         else {
-            Log.d(TAG, "Getting the balance of the default account (ID: " + defaultAccountId + ").");
+            Timber.d("Getting the balance of the default account (ID: %d).", defaultAccountId);
 
             accountsViewModel.getBankAccount(defaultAccountId).observe(this, bankAccount -> {
-                if (bankAccount == null) {
-                    Log.e(TAG, "Failed to get balance of default account.");
+                if (bankAccount == null && defaultAccountId != -1) {
+                    Timber.e("Failed to get balance of default account (ID: %d).  Bank account is null.", defaultAccountId);
 
                     balanceTextView.setText(String.format(Locale.US, "$%.2f", 0.0));
-                    balanceTextView.setTextColor(getResources().getColor(R.color.colorWhite));
+                    balanceTextView.setTextColor(getResources().getColor(R.color.colorDarkGrey));
 
                     return;
                 }
@@ -160,9 +194,9 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    public void observeNotifications() {
+    private void observeNotifications() {
         // Initialize RecyclerViewAdapter with empty list
-        notificationsRecyclerViewAdapter = new NotificationsRecyclerViewAdapter(new ArrayList<Expense>(), getContext());
+        notificationsRecyclerViewAdapter = new NotificationsRecyclerViewAdapter(new ArrayList<>(), getContext());
 
         // Set the LayoutManager to be the LinearLayoutManager
         // This makes the list display linearly
@@ -186,5 +220,10 @@ public class HomeFragment extends Fragment {
             notificationsRecyclerViewAdapter.addItems(expenseList);
 
         });
+    }
+
+    private void showToastMessage(String message) {
+        Toast.makeText(getContext(), message,
+                Toast.LENGTH_SHORT).show();
     }
 }

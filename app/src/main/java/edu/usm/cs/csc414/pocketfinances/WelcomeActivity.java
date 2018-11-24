@@ -16,12 +16,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import timber.log.Timber;
+
 @SuppressWarnings("deprecation")
 public class WelcomeActivity extends AppCompatActivity {
 
-    private static final String TAG = "WelcomeActivity";
-
-    FrameLayout fragmentHolderLayout;
+    FrameLayout fragmentHolder;
     TextView nextButton;
     FragmentTransaction fragmentTransaction;
     ImageView background;
@@ -36,10 +36,11 @@ public class WelcomeActivity extends AppCompatActivity {
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-        fragmentHolderLayout = findViewById(R.id.activity_welcome_framelayout);
+        fragmentHolder = findViewById(R.id.activity_welcome_framelayout);
         nextButton = findViewById(R.id.activity_welcome_next_textview);
         background = findViewById(R.id.activity_welcome_background);
 
+        new CustomSharedPreferences(getApplicationContext()).setActivityBackground(CustomSharedPreferences.BACKGROUND_DARKGREY);
         background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
 
         // Set bottom padding to the layout so that any present soft keys don't overlap the nav bar
@@ -47,7 +48,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction
-                .replace(fragmentHolderLayout.getId(), new WelcomeFragment1Intro())
+                .replace(fragmentHolder.getId(), new WelcomeFragment1Intro())
                 .commit();
 
 
@@ -64,37 +65,40 @@ public class WelcomeActivity extends AppCompatActivity {
                     fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
                     nextButton.setText(getString(R.string.continue_text));
-                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment2Accounts()).commit();
+                    fragmentTransaction.replace(fragmentHolder.getId(), new WelcomeFragment2Accounts()).commit();
                     break;
                 case 2:
                     fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
                     nextButton.setText(getString(R.string.continue_text));
-                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment3Budget()).commit();
+                    //fragmentTransaction.replace(fragmentHolder.getId(), new WelcomeFragment3Budget()).commit();
+                    // Skip BudgetFragment for now.  Need to implement later.
+                    counter++;
+                    fragmentTransaction.replace(fragmentHolder.getId(), new WelcomeFragment4Security()).commit();
                     break;
                 case 3:
                     fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
                     nextButton.setText(R.string.continue_text);
-                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment4Security()).commit();
+                    fragmentTransaction.replace(fragmentHolder.getId(), new WelcomeFragment4Security()).commit();
                     break;
                 case 4:
                     fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
                     nextButton.setText(R.string.skip_text);
-                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment4SecurityEnter()).commit();
+                    fragmentTransaction.replace(fragmentHolder.getId(), new WelcomeFragment4SecurityEnter()).commit();
                     break;
                 case 5:
                     fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
                     nextButton.setText(R.string.continue_text);
-                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment4SecurityFingerprint()).commit();
+                    fragmentTransaction.replace(fragmentHolder.getId(), new WelcomeFragment4SecurityFingerprint()).commit();
                     break;
                 case 6:
                     fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
                     nextButton.setText(getString(R.string.finish_text));
-                    fragmentTransaction.replace(fragmentHolderLayout.getId(), new WelcomeFragment5Done()).commit();
+                    fragmentTransaction.replace(fragmentHolder.getId(), new WelcomeFragment5Done()).commit();
                     break;
                 case 7:
                     Intent intent = new Intent(getBaseContext(), SplashActivity.class);
@@ -120,21 +124,21 @@ public class WelcomeActivity extends AppCompatActivity {
             return;
         }
 
-        Log.i(TAG, "Fingerprint scanner not available for use.  Skipping to DoneFragment");
+        Timber.i("Fingerprint scanner not available for use.  Skipping to DoneFragment");
         jumpToDone();
     }
 
 
     private void setBottomPadding() {
-        Log.v(TAG, "Checking for soft keys.");
+        Timber.v("Checking for soft keys.");
         try {
             int softKeyBarHeight = getSoftButtonsBarHeight();
-            Log.d(TAG, "Soft key bar height: " + softKeyBarHeight);
+            Timber.d("Soft key bar height: ", softKeyBarHeight);
 
             nextButton.setPadding(0,0,0, softKeyBarHeight);
 
         } catch(Exception e) {
-            Log.e(TAG, "Error in checking presence of soft keys and adapting UI accordingly.", e);
+            Timber.e(e, "Error in checking presence of soft keys and adapting UI accordingly.");
         }
     }
 

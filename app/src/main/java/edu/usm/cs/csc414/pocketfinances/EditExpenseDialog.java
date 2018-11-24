@@ -155,60 +155,38 @@ public class EditExpenseDialog extends Dialog {
 
     private void setListeners() {
 
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
+        cancelBtn.setOnClickListener(view -> dismiss());
+
+        saveBtn.setOnClickListener(view -> {
+            if (tryToSave()) dismiss();
         });
 
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tryToSave()) dismiss();
-            }
+        isRecurringCheckBox.setOnCheckedChangeListener((compoundButton,  b) -> recurrenceSpinner.setEnabled(b));
+
+        isDeposit.setOnClickListener(view -> {
+            depositOrDeduction = Expense.DEPOSIT;
+            setDepositDeductionColors();
         });
 
-        isRecurringCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                recurrenceSpinner.setEnabled(b);
-            }
+        isDeduction.setOnClickListener(view -> {
+            depositOrDeduction = Expense.DEDUCT;
+            setDepositDeductionColors();
         });
 
-        isDeposit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                depositOrDeduction = Expense.DEPOSIT;
-                setDepositDeductionColors();
-            }
-        });
+        expenseDate.setOnClickListener(view -> {
 
-        isDeduction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                depositOrDeduction = Expense.DEDUCT;
-                setDepositDeductionColors();
-            }
-        });
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                    expense.getDate().set(Calendar.YEAR, year);
+                    date.set(Calendar.MONTH, monthOfYear);
+                    date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-        expenseDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                        expense.getDate().set(Calendar.YEAR, year);
-                        date.set(Calendar.MONTH, monthOfYear);
-                        date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-                        expenseDate.setText(String.format(Locale.US, "%2d/%2d/%4d",
-                                date.get(Calendar.MONTH)+1, date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.YEAR)));
-                    }
-                }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.show();
-            }
+                    expenseDate.setText(String.format(Locale.US, "%2d/%2d/%4d",
+                            date.get(Calendar.MONTH)+1, date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.YEAR)));
+                }
+            }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.show();
         });
 
         expenseAmount.addTextChangedListener(new MoneyTextWatcher(expenseAmount));
@@ -300,34 +278,30 @@ public class EditExpenseDialog extends Dialog {
 
     private void observeAccounts() {
         BankAccountsViewModel accountsViewModel =  new BankAccountsViewModel(activity.getApplication());
-        accountsViewModel.getBankAccountsList().observe((LifecycleOwner) activity, new Observer<List<BankAccount>>() {
-            @Override
-            public void onChanged(@Nullable List<BankAccount> bankAccountsList) {
-                bankAccounts = bankAccountsList;
+        accountsViewModel.getBankAccountsList().observe((LifecycleOwner) activity, bankAccountsList -> {
+            bankAccounts = bankAccountsList;
 
-                ArrayList<String> bankAccountArrayList = new ArrayList<>();
+            ArrayList<String> bankAccountArrayList = new ArrayList<>();
 
-                if (bankAccounts != null) {
-                    for (BankAccount account : bankAccounts) {
-                        bankAccountArrayList.add(account.getAccountName());
-                    }
-                }
-                else {
-                    showToastMessage("You must add a bank account first!");
-                    cancel();
-                }
-
-                ArrayAdapter<String> bankAccountArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, bankAccountArrayList);
-                bankAccountSpinner.setAdapter(bankAccountArrayAdapter);
-
-                for (int  i = 0; i < bankAccounts.size(); i++) {
-                    if (expense.getAccountId() == bankAccounts.get(i).getAccountId()) {
-                        bankAccountSpinner.setSelection(i);
-                    }
-
+            if (bankAccounts != null) {
+                for (BankAccount account : bankAccounts) {
+                    bankAccountArrayList.add(account.getAccountName());
                 }
             }
+            else {
+                showToastMessage("You must add a bank account first!");
+                cancel();
+            }
 
+            ArrayAdapter<String> bankAccountArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, bankAccountArrayList);
+            bankAccountSpinner.setAdapter(bankAccountArrayAdapter);
+
+            for (int  i = 0; i < bankAccounts.size(); i++) {
+                if (expense.getAccountId() == bankAccounts.get(i).getAccountId()) {
+                    bankAccountSpinner.setSelection(i);
+                }
+
+            }
         });
     }
 

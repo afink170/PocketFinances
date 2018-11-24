@@ -15,9 +15,9 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListener {
+import timber.log.Timber;
 
-    private static final String TAG = "EditDeleteExpense";
+public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListener {
 
     private Activity activity;
     private TextView editExpenseTextView, deleteExpenseTextView;
@@ -52,7 +52,6 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
                 dismiss();
                 break;
             case R.id.dialog_expense_editdelete_delete_textview:
-                Log.v(TAG, "deleteExpense button clicked!");
                 deleteExpense();
                 dismiss();
                 break;
@@ -63,15 +62,9 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
     }
 
 
-    private void showToastMessage(String message) {
-        Toast.makeText(activity.getApplicationContext(), message,
-                Toast.LENGTH_LONG).show();
-    }
-
-
     private void deleteExpense() {
 
-        Log.v(TAG, "Begin deleteExpense transaction.");
+        Timber.v("Begin deleteExpense transaction.");
 
         final AlertDialog.Builder confirmDeleteDialog = new AlertDialog.Builder(activity, android.R.style.Theme_DeviceDefault_Light_Dialog);
 
@@ -79,30 +72,24 @@ public class EditDeleteExpenseDialog extends Dialog implements View.OnClickListe
         View alertDialogView = inflater.inflate(R.layout.dialog_expense_confirmdelete, null);
 
         TextView confirmText = alertDialogView.findViewById(R.id.dialog_expense_confirmdelete_textview);
-        confirmText.setText("Are you sure you wish to delete \"" + expense.getTitle() + "?\"");
+        confirmText.setText(String.format("Are you sure you wish to delete \"%s?\"", expense.getTitle()));
 
         confirmDeleteDialog.setCancelable(true);
         confirmDeleteDialog.setView(alertDialogView);
 
-        confirmDeleteDialog.setPositiveButton("Delete", new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        confirmDeleteDialog.setPositiveButton("Delete", (dialogInterface, i) -> {
                 //showToastMessage("Expense deleted!");
-                Log.v(TAG, "deleteExpense confirmed!");
+                Timber.v("deleteExpense confirmed!");
                 expensesViewModel.deleteItem(expense);
                 if (!(expense.getIsFirstOccurrence() && expense.getIsRecurring()))
                     new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(expense.getAccountId(), expense.getDepositOrDeduct(), expense.getAmount()));
                 dialogInterface.dismiss();
-            }
-        });
+            });
 
-        confirmDeleteDialog.setNegativeButton("Cancel", new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Log.v(TAG, "deleteExpense canceled!");
+        confirmDeleteDialog.setNegativeButton("Cancel", (dialogInterface, i) -> {
+                Timber.v("deleteExpense canceled!");
                 dialogInterface.dismiss();
-            }
-        });
+            });
         confirmDeleteDialog.show();
     }
 

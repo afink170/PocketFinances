@@ -11,9 +11,6 @@ import android.view.ViewGroup;
 
 public class WelcomeFragment5Done extends Fragment {
 
-
-    private static final String TAG = "WelcomeFragment5";
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

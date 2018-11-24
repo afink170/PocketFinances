@@ -14,9 +14,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
+import timber.log.Timber;
 
-    private static final String TAG = "AddRecurrencesTask";
+public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
 
     private ExpensesViewModel viewModel;
     private List<Expense> expensesList;
@@ -35,7 +35,7 @@ public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void[] params) {
 
         try {
-            Log.i(TAG, "Running background task for adding recurring expenses.");
+            Timber.i("Running background task for adding recurring expenses.");
 
             if (activity != null) {
                 // Initialize the ViewModel
@@ -44,24 +44,21 @@ public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
                                 true, Calendar.getInstance(), true)).get(ExpensesViewModel.class);
             }
             else {
-                Log.e(TAG, "Context is null!");
+                Timber.e("Context is null!");
                 return null;
             }
 
-            viewModel.getExpensesList().observe(activity, new Observer<List<Expense>>() {
-                @Override
-                public void onChanged(@Nullable List<Expense> expenseList) {
-                    if (expenseList != null) {
-                        expensesList = expenseList;
-                        addRecurringExpenses();
-                    }
-                    else
-                        Log.e(TAG, "No recurring expenses found!");
+            viewModel.getExpensesList().observe(activity, expenseList -> {
+                if (expenseList != null) {
+                    expensesList = expenseList;
+                    addRecurringExpenses();
                 }
+                else
+                    Timber.e("Recurring expenses list is null!");
             });
 
         } catch (Exception e) {
-            Log.e(TAG, "Failed to add recurring expenses to database!", e);
+            Timber.e(e, "Failed to add recurring expenses to database!");
         }
 
 
@@ -78,7 +75,6 @@ public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
             ArrayList<Integer> accountIds = new ArrayList<>();
 
             for (Expense expense : expensesList) {
-                //Log.v(TAG, expense.toString());
 
                 if (!accountIds.contains(expense.getAccountId())) {
                     accountIds.add(expense.getAccountId());
@@ -106,7 +102,7 @@ public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
                         newExpense.setNextOccurrence(dates.get(i));
                         newExpense.setIsFirstOccurrence(false);
 
-                        Log.v(TAG, newExpense.toString());
+                        Timber.v(newExpense.toString());
 
                         newExpenses.add(newExpense);
 
@@ -135,14 +131,14 @@ public class AddRecurringExpensesTask extends AsyncTask<Void, Void, Void> {
 
                 }
                 else if (dates.size() == 1)
-                    Log.i(TAG, "Expense " + expense.getExpenseId() + " : " + expense.getTitle() +" is up to date.  No action necessary.");
+                    Timber.v("Expense %d : %s is up to date.  No action necessary.", expense.getExpenseId(), expense.getTitle());
             }
         }
         else
-            Log.i(TAG, "No new recurring expenses found!");
+            Timber.i("No new recurring expenses found.");
 
         //viewModel.getExpensesList().removeObservers(activity);
-        Log.i(TAG, "Add recurring expenses task complete!");
+        Timber.i("Add recurring expenses task complete!");
     }
 
 

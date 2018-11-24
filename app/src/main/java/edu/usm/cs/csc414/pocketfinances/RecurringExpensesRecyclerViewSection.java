@@ -10,9 +10,6 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 public class RecurringExpensesRecyclerViewSection extends StatelessSection {
 
-
-    private static final String TAG = RecurringExpensesRecyclerViewSection.class.getSimpleName();
-
     private String title;
     private List<Expense> list;
     private Context context;

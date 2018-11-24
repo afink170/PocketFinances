@@ -1,18 +1,19 @@
 package edu.usm.cs.csc414.pocketfinances;
 
 import android.app.Application;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.util.Base64;
 import android.util.Log;
 
 import com.commonsware.cwac.saferoom.SQLCipherUtils;
 
-import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.spongycastle.crypto.params.KeyParameter;
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+
+import io.fabric.sdk.android.Fabric;
 
 import java.io.IOException;
-import java.security.SecureRandom;
+
+import timber.log.Timber;
 
 /**
  * Class for the application
@@ -21,7 +22,6 @@ import java.security.SecureRandom;
 public class AppClass extends Application {
 
     private static final String DB_NAME = "finances_db";
-    private static final String TAG = "AppClass";
 
 
     /**
@@ -32,6 +32,19 @@ public class AppClass extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics(), new Answers());
+
+
+        if (BuildConfig.DEBUG)
+            Timber.plant(new Timber.DebugTree());
+        else
+            Timber.plant(new Timber.Tree() {
+                @Override
+                protected void log(int priority, String tag, String message, Throwable t) {
+                    if (priority == Log.ERROR)
+                        Crashlytics.log(priority, tag, message + t.getMessage());
+                }
+            });
 
 
         //------------------------ SET CUSTOM FONT -------------------------------------
@@ -54,10 +67,10 @@ public class AppClass extends Application {
 
 
         //------------------------ HANDLE APP VERSION CHANGES -------------------------
-        if(sharedPrefs.getVersionCode() <= 1) {
+        if(sharedPrefs.getVersionCode() < 181117) {
             // There are some breaking changes before this,
             // so it is best to just clear the database and shared prefs
-            Log.i(TAG, "Database-breaking changes have been introduced since last update, " +
+            Timber.i("Database-breaking changes have been introduced since last update, " +
                     "so database and shared preferences will be cleared.");
 
             // Reset all stored preferences
@@ -69,12 +82,12 @@ public class AppClass extends Application {
             @SuppressWarnings("deprecation")
             int version = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
 
-            Log.i(TAG, "Current app version code:  " + version);
+            Timber.i("Current app version code:  %d", version);
 
             sharedPrefs.setVersionCode(version);
 
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Failed to get app version!", e);
+            Timber.e(e, "Failed to get app version!");
         }
 
 
@@ -85,26 +98,15 @@ public class AppClass extends Application {
 
             sharedPrefs.setIsFirstRun(true);
 
-            // TODO : Need to perhaps find a safer way to do this?
+            // Delete any previous database files just in case
             FinancesDatabase.deleteDatabase(getApplicationContext());
 
             // Generate or set encryption key, then store it in sharedPrefs as an encrypted string.
             // That way, the encryption key is never stored as plain text
             sharedPrefs.generateEncryptKeyAndStore();
 
-
-
-            // Number of bytes of salt
-            final int bytes = 20;
-
-            byte[] salt;
-
-            // Generate random salt
-            SecureRandom rng = new SecureRandom();
-            salt = rng.generateSeed(bytes);
-
-            // Store salt in shared prefs
-            sharedPrefs.setSalt(salt);
+            // Generate unique salt and store it in shared prefs
+            sharedPrefs.setSalt(HashingHandler.generateSalt());
         }
 
 
@@ -125,23 +127,21 @@ public class AppClass extends Application {
 
                     // Encrypt database with encryption key
                     SQLCipherUtils.encrypt(getApplicationContext(), DB_NAME, sharedPrefs.getEncryptKey());
-                    Log.i(TAG, "Successfully encrypted database!");
+                    Timber.i("Successfully encrypted database!");
 
                 } catch (IOException e) {
-                    Log.e(TAG, "Failed to encrypt previously unencrypted database!", e);
+                    Timber.e(e, "Failed to encrypt previously unencrypted database!");
                 }
             } else if (state == SQLCipherUtils.State.ENCRYPTED)
-
                 // Otherwise, good to go
-                Log.i(TAG, "Database is encrypted.  No action necessary.");
+                Timber.i("Database is encrypted.  No action necessary.");
 
             else if (state == SQLCipherUtils.State.DOES_NOT_EXIST)
-
                 // No database found.  Normal if first launch
-                Log.e(TAG, "No database found.");
+                Timber.w("No database found.");
 
         } catch(Exception e) {
-            Log.e(TAG, "Failed to get database encryption state!", e);
+            Timber.e(e, "Failed to get database encryption state!");
         }
     }
 }

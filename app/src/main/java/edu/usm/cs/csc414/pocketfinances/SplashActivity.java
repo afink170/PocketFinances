@@ -11,9 +11,9 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-public class SplashActivity extends AppCompatActivity {
+import timber.log.Timber;
 
-    private static final String TAG = "SplashActivity";
+public class SplashActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
     ImageView background;
@@ -23,13 +23,29 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // Initialize progress bar and animate it
+        CustomSharedPreferences sharedPrefs = new CustomSharedPreferences(getApplicationContext());
+
+        // Initialize progress_light bar and animate it
         progressBar = findViewById(R.id.activity_splash_progress_bar);
         progressBar.setIndeterminate(true);
+        progressBar.setIndeterminateDrawable(
+                getDrawable(
+                        sharedPrefs.getActivityTheme() == CustomSharedPreferences.THEME_DARK
+                        ? R.drawable.progress_light : R.drawable.progress_dark
+                )
+        );
         progressBar.animate();
 
         background = findViewById(R.id.activity_splash_background);
-        background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
+
+        try {
+            // Set chosen background from sharedPrefs
+            background.setImageResource(sharedPrefs.getActivityBackground());
+        }
+        catch (Exception e) {
+            sharedPrefs.setActivityBackground(CustomSharedPreferences.BACKGROUND_LIGHTBLUE);
+            background.setImageResource(sharedPrefs.getActivityBackground());
+        }
 
         new LaunchMainActivity(this).execute();
     }
@@ -47,13 +63,15 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void[] voids) {
 
+            //Timber.v("LaunchMainActivity.doInBackground called.");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                Log.e(TAG, "Failed to wait before launching MainActivity.", e);
+                Timber.e(e, "Failed to wait before launching MainActivity.");
             }
 
             // Launch MainActivity
+            //Timber.v("Launching MainActivity.");
             Intent intent = new Intent(activity, MainActivity.class);
             activity.startActivity(intent);
             return null;
@@ -61,6 +79,14 @@ public class SplashActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            //Timber.v("LaunchMainActivity.onPostExecute called.");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Timber.e(e, "Failed to wait before finishing SplashActivity.");
+            }
+
+            //Timber.v("Finishing SplashActivity.");
             activity.finish();
         }
     }

@@ -15,9 +15,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-public class WelcomeFragment2Accounts extends Fragment {
+import timber.log.Timber;
 
-    private static final String TAG = "WelcomeFragment2";
+public class WelcomeFragment2Accounts extends Fragment {
 
     private ImageButton addAccountButton;
     private BankAccountsViewModel viewModel;
@@ -26,7 +26,7 @@ public class WelcomeFragment2Accounts extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "Attempting to create WelcomeFragment2.");
+        Timber.d("Attempting to create WelcomeFragment2.");
         View view = inflater.inflate(R.layout.fragment_welcome_2_accounts, container, false);
 
         // Initialize the ViewModel
@@ -73,7 +73,7 @@ public class WelcomeFragment2Accounts extends Fragment {
                         showToastMessage(newAccount.getAccountName() + " added!");
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Failed to get user input from AlertDialog.", e);
+                    Timber.e(e, "Failed to get user input from AlertDialog.");
                     showToastMessage("Error: Failed to get user input.");
                     dialogInterface.cancel();
                 }
@@ -91,7 +91,7 @@ public class WelcomeFragment2Accounts extends Fragment {
 
     private void showToastMessage(String message) {
         Toast.makeText(getActivity().getBaseContext(), message,
-                Toast.LENGTH_LONG).show();
+                Toast.LENGTH_SHORT).show();
     }
 
 }
