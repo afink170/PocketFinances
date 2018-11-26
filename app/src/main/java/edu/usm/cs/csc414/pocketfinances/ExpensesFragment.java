@@ -126,16 +126,23 @@ public class ExpensesFragment extends Fragment {
 
 
     private void observeActiveAccount(BankAccountsViewModel accountsViewModel) {
-        accountsViewModel.getBankAccount(activeAccountId).observe(this, bankAccount -> {
-            if (bankAccount.getAccountBalance() < 0.0) {
-                parentAccountBalanceTextView.setText(String.format(Locale.US, "-$%.2f", Math.abs(bankAccount.getAccountBalance())));
-                parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorRed));
-            }
-                else {
-                parentAccountBalanceTextView.setText(String.format(Locale.US, "$%.2f", bankAccount.getAccountBalance()));
-                parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorGreen));
-            }
-            titleTextView.setText(bankAccount.getAccountName());
-        });
+        if (activeAccountId != -1) {
+            accountsViewModel.getBankAccount(activeAccountId).observe(this, bankAccount -> {
+                try {
+                    if (bankAccount.getAccountBalance() < 0.0) {
+                        parentAccountBalanceTextView.setText(String.format(Locale.US, "-$%.2f", Math.abs(bankAccount.getAccountBalance())));
+                        parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorRed));
+                    }
+                    else {
+                        parentAccountBalanceTextView.setText(String.format(Locale.US, "$%.2f", bankAccount.getAccountBalance()));
+                        parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                    }
+                    titleTextView.setText(bankAccount.getAccountName());
+                }
+                catch(NullPointerException e) {
+                    Timber.e(e, "Failed to observer active account balance!");
+                }
+            });
+        }
     }
 }

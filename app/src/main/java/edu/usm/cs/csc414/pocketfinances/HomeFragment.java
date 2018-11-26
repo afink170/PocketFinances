@@ -18,7 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import timber.log.Timber;
@@ -80,6 +82,9 @@ public class HomeFragment extends Fragment {
 
             Timber.d("Attempting to observe expenses in database for filling the notifications list.");
             observeNotifications();
+
+            Timber.d("Attempting to observe total spending from expenses in the database.");
+            observeSpending();
 
             // Set listeners for UI elements, such as OnClick listeners for buttons
             Timber.v("Attempting to set UI event listeners.");
@@ -213,12 +218,46 @@ public class HomeFragment extends Fragment {
         // Set the RecyclerView to observe the Expenses table in the DB
         expensesViewModel.getExpensesList().observe(this, expenseList -> {
 
-            if (expenseList != null)
+            if (expenseList != null) {
                 Collections.sort(expenseList,
                         (e1, e2) -> e1.getNextOccurrence().compareTo(e2.getNextOccurrence()));
 
-            notificationsRecyclerViewAdapter.addItems(expenseList);
+                List<Expense> trimmedExpenseList = new ArrayList<>();
 
+                // Only display the first 10 notifications.
+                for (int i = 0; i < expenseList.size() && i < 10; i++)
+                    trimmedExpenseList.add(expenseList.get(i));
+
+                notificationsRecyclerViewAdapter.addItems(trimmedExpenseList);
+            }
+
+        });
+    }
+
+
+    private void observeSpending() {
+        ExpensesViewModel expensesViewModel = new ExpensesViewModel(getActivity().getApplication());
+
+        expensesViewModel.getExpensesList().observe(this, expenseList -> {
+
+            double spending = 0.0;
+            Calendar currentTime = Calendar.getInstance();
+
+            try {
+                for (Expense expense : expenseList) {
+                    // Check if expense is a deduction, that it is not a parent recurring expense, and that is occurred this month.
+                    if (expense.getDepositOrDeduct() == Expense.DEDUCT &&
+                            (!expense.getIsRecurring() || !expense.getIsFirstOccurrence()) &&
+                            currentTime.get(Calendar.MONTH) == expense.getDate().get(Calendar.MONTH) &&
+                            currentTime.get(Calendar.YEAR) == expense.getDate().get(Calendar.YEAR))
+                        spending += expense.getAmount();
+                }
+            }
+            catch (NullPointerException e) {
+                Timber.e(e, "Failed to get total spending!");
+            }
+
+            budgetTextView.setText(ExpenseTypeConverters.amountToString(spending));
         });
     }
 
