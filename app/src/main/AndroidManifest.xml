@@ -42,6 +42,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".WelcomeActivity" />
         <activity android:name=".SplashActivity" />
+        <activity android:name=".SettingsActivity"/>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="1ff77bffdd06f153900983fa0147dd7bd159c684" />

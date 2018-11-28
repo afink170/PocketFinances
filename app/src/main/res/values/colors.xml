@@ -16,4 +16,5 @@
     <color name="colorGreen">#006e00</color>
     <color name="dialogBackgroundColor">#292929</color>
     <color name="colorDisabledButton">#8b8b8b</color>
+    <color name="titleBarBlue">#191966</color>
 </resources>

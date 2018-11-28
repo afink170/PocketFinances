@@ -17,7 +17,7 @@
         android:background="?android:selectableItemBackgroundBorderless"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:contentDescription="Settings" />
+        android:contentDescription="@string/title_activity_settings" />
 
     <TextView
         android:id="@+id/fragment_home_title_textview"

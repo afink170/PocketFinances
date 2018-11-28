@@ -1,6 +1,7 @@
 package edu.usm.cs.csc414.pocketfinances;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -113,7 +114,16 @@ public class HomeFragment extends Fragment {
 
         settingsBtn.setOnClickListener(view -> {
             // Launch settings activity
-        });
+           try {
+
+               Intent settings = new Intent(getActivity(), SettingsActivity.class);
+               getActivity().startActivity(settings);
+           }
+
+           catch (Exception e){
+               Timber.e(e,"Settings Failed");
+            }
+           });
     }
 
 
