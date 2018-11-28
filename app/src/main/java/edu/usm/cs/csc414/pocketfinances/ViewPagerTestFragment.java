@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
@@ -63,7 +63,7 @@ public class ViewPagerTestFragment extends Fragment {
         viewPager = view.findViewById(R.id.fragment_test_viewpager_layout);
 
 
-        viewPager.setAdapter(new VerticalViewPagerAdapter(getFragmentManager()));
+        viewPager.setAdapter(new VerticalViewPagerAdapter(getChildFragmentManager()));
 
         viewPager.setPageTransformer(true, (view1, position) -> {
             int pageWidth = view1.getWidth();
@@ -89,9 +89,7 @@ public class ViewPagerTestFragment extends Fragment {
                 view1.setScaleY(scaleFactor);
 
                 // Fade the page relative to its size.
-                view1.setAlpha(MIN_ALPHA +
-                        (scaleFactor - MIN_SCALE) /
-                                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
+                view1.setAlpha(MIN_ALPHA + (scaleFactor - MIN_SCALE) / (1 - MIN_SCALE) * (1 - MIN_ALPHA));
 
             } else { // (1,+Infinity]
                 // This page is way off-screen to the right.
@@ -99,15 +97,13 @@ public class ViewPagerTestFragment extends Fragment {
             }
         });
 
-
-
         return view;
     }
 
 
 
 
-    public class VerticalViewPagerAdapter extends FragmentPagerAdapter {
+    public class VerticalViewPagerAdapter extends FragmentStatePagerAdapter {
 
         public VerticalViewPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -116,7 +112,8 @@ public class ViewPagerTestFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
+
+            Timber.d("New VerticalViewPager position: %d", position);
 
             Bundle bundle = new Bundle();
 
@@ -183,8 +180,9 @@ public class ViewPagerTestFragment extends Fragment {
 
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            Timber.d("Creating PieChart fragment.");
+
             View view = inflater.inflate(R.layout.fragment_test_viewpager_piechart, container, false);
 
             try {
@@ -233,7 +231,7 @@ public class ViewPagerTestFragment extends Fragment {
         }
 
         private void addDataSet() {
-            Timber.d("addDataSet: ");
+            //Timber.d("addDataSet: ");
 
             ArrayList<PieEntry> entries = new ArrayList<>();
             //populating the data
@@ -253,6 +251,8 @@ public class ViewPagerTestFragment extends Fragment {
             PieData pieData= new PieData(pieDataSet);
             pieData.setValueFormatter(new PercentFormatter());
             pieData.setValueTextSize(12);
+
+            Timber.d("Populating and rendering PieChart.");
             pieChart.setData(pieData);
             pieChart.invalidate();
         }
@@ -274,6 +274,8 @@ public class ViewPagerTestFragment extends Fragment {
         @Nullable
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            Timber.d("Creating LineChart fragment.");
+
             View view = inflater.inflate(R.layout.fragment_test_viewpager_barchart, container, false);
 
 
@@ -327,10 +329,11 @@ public class ViewPagerTestFragment extends Fragment {
 
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
+                    /*
                     Timber.d("onValueSelected: Value select from chart:");
                     Timber.d("onValueSelected: %s", e.describeContents());
                     Timber.d("onValueSelected: %s", h.toString());
-
+                    */
                 }
 
                 @Override
@@ -344,7 +347,7 @@ public class ViewPagerTestFragment extends Fragment {
 
 
         private void addDataSet() {
-            Timber.d("addDataSet: ");
+            //Timber.d("addDataSet: ");
 
 
             ArrayList<BarEntry> entriesList = new ArrayList<>();
@@ -372,6 +375,7 @@ public class ViewPagerTestFragment extends Fragment {
             barData.setValueTextSize(12);
             barData.setBarWidth(0.9f);
 
+            Timber.d("Populating and rendering BarChart.");
             barChart.setData(barData);
             barChart.invalidate();
         }
@@ -396,6 +400,8 @@ public class ViewPagerTestFragment extends Fragment {
         @Nullable
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            Timber.d("Creating LineChart fragment.");
+
             View view = inflater.inflate(R.layout.fragment_test_viewpager_linechart, container, false);
 
 
@@ -448,10 +454,11 @@ public class ViewPagerTestFragment extends Fragment {
 
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
+                    /*
                     Timber.d("onValueSelected: Value select from chart:");
                     Timber.d("onValueSelected: %s", e.describeContents());
                     Timber.d("onValueSelected: %s", h.toString());
-
+                    */
                 }
 
                 @Override
@@ -465,7 +472,7 @@ public class ViewPagerTestFragment extends Fragment {
 
 
         private void addDataSet() {
-            Timber.d("addDataSet: ");
+            //Timber.d("addDataSet: ");
 
 
             ArrayList<Entry> entriesList = new ArrayList<>();
@@ -492,6 +499,7 @@ public class ViewPagerTestFragment extends Fragment {
             lineData.setValueFormatter(new CurrencyFormatter());
             lineData.setValueTextSize(12);
 
+            Timber.d("Populating and rendering LineChart.");
             lineChart.setData(lineData);
             lineChart.invalidate();
         }

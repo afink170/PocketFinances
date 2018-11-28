@@ -1,21 +1,16 @@
 package edu.usm.cs.csc414.pocketfinances;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.util.Log;
-import android.view.MenuItem;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.DisplayMetrics;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
-
-import java.util.List;
+import timber.log.Timber;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -30,47 +25,81 @@ import java.util.List;
  */
 public class SettingsActivity extends AppCompatActivity {
 
+    FragmentTransaction fragmentTransaction;
+    CustomSharedPreferences sharedPrefs;
 
     ImageView background;
-    FragmentTransaction fragmentTransaction;
     FrameLayout fragmentHolder;
-    ImageButton homeBtn;
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Timber.d("Attempting to create SettingsActivity.");
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_settings);
-        homeBtn = findViewById(R.id.fragment_home_settings_btn);
-        setListeners();
 
+        // Allow the app window to fill the entire screen
+        Window w = getWindow();
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        background = findViewById(R.id.activity_settings_background);
+        fragmentHolder = findViewById(R.id.activity_settings_fragmentholder);
+
+        sharedPrefs = new CustomSharedPreferences(getApplicationContext());
+
+        try {
+            // Set chosen background from sharedPrefs
+            background.setImageResource(sharedPrefs.getActivityBackground());
+        }
+        catch (Exception e) {
+            sharedPrefs.setActivityBackground(CustomSharedPreferences.BACKGROUND_DARKGREY);
+            background.setImageResource(sharedPrefs.getActivityBackground());
         }
 
-    private void setListeners() {
-        homeBtn.setOnClickListener(view -> {
-            Intent back_home = new Intent(view.getContext(), MainActivity.class);
-            startActivity(back_home);
-        });
-    }
+        setFragmentHolderPadding();
 
 
-    public static void sendViewToBack(final View child) {
-        final ViewGroup parent = (ViewGroup)child.getParent();
-        if (null != parent) {
-            parent.removeView(child);
-            parent.addView(child, 0);
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction
+                .replace(fragmentHolder.getId(), new SettingsMainFragment())
+                .commit();
+        }
+
+
+
+
+    /**
+     * Method for handling the window size for the activity.
+     * The activity should span the entire screen, including the space behind any potential soft keys.
+     * Therefore, we need to add bottom padding to the FragmentHolder so that it floats above the soft keys, not behind it.
+     */
+    private void setFragmentHolderPadding() {
+        Timber.d("Checking for soft keys.");
+        try {
+            int softKeyBarHeight = getSoftButtonsBarHeight();
+            Timber.d("Soft key bar height: %d", softKeyBarHeight);
+
+            fragmentHolder.setPadding(0,0,0, softKeyBarHeight);
+
+        } catch(Exception e) {
+            Timber.e(e, "Error in checking presence of soft keys and adapting UI accordingly.");
         }
     }
 
-    public void changeBackground(View view) {
 
-
-    }
-
-    public void about(View view) {
-
-
+    /**
+     * Method for getting the height of the soft key bar, if it exists on the device.
+     *
+     * @return The height in pixels of soft key bar, if present.  Otherwise, returns 0.
+     */
+    private int getSoftButtonsBarHeight() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int usableHeight = metrics.heightPixels;
+        getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        int realHeight = metrics.heightPixels;
+        return realHeight - usableHeight;
     }
 }

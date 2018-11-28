@@ -1,6 +1,7 @@
 package edu.usm.cs.csc414.pocketfinances;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
@@ -9,9 +10,14 @@ import com.commonsware.cwac.saferoom.SQLCipherUtils;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 
+import net.sqlcipher.database.SQLiteDatabase;
+
 import io.fabric.sdk.android.Fabric;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import timber.log.Timber;
 
@@ -110,10 +116,11 @@ public class AppClass extends Application {
         }
 
 
+
         //------------------------ HANDLE DATABASE ENCRYPTION STATE --------------------
         try {
             // Get database state
-            SQLCipherUtils.State state = SQLCipherUtils.getDatabaseState(getApplicationContext(), DB_NAME);
+            SQLCipherUtils.State state = getDatabaseState(getApplicationContext(), DB_NAME);
 
             // Check whether database is encrypted
             if (state == SQLCipherUtils.State.UNENCRYPTED) {
@@ -122,7 +129,7 @@ public class AppClass extends Application {
                     // Get database instance
                     FinancesDatabase db = FinancesDatabase.getDatabase(getApplicationContext());
 
-                    // Close database
+                    // Close database before encrypting
                     db.close();
 
                     // Encrypt database with encryption key
@@ -143,5 +150,75 @@ public class AppClass extends Application {
         } catch(Exception e) {
             Timber.e(e, "Failed to get database encryption state!");
         }
+    }
+
+
+
+    /**
+     * Method for getting the current state of the database.
+     * SQLCipherUtils provides a method for this; however, the provided method throws an exception before returning the State
+     * if the State is ENCRYPTED, even though there is nothing wrong.
+     * Therefore, a custom method is implemented here.
+     * This method first checks whether the database file exists.  If it doesn't exist, it returns State.DOES_NOT_EXIST.
+     * Next, it reads the first 16 bytes of the database file.  In an unencrypted SQLite database, the first 16 bytes contain a header that reads "SQLite format 3".
+     * In an encrypted database, the header contains information about the encryption salt.
+     * Therefore, it reads the header, and checks whether the header equals "SQLite format 3".  If so, it returns State.UNENCRYPTED.
+     * If not, it returns State.ENCRYPTED.
+     *
+     * @param context The context of the application.
+     * @param databaseName The name of the database file (just the reference name, not the actual filename with extension).
+     * @return A SQLCipherUtils.State object referring to the database state.
+     */
+    private SQLCipherUtils.State getDatabaseState(Context context, String databaseName) {
+        SQLiteDatabase.loadLibs(context);
+
+        // Get the database file by name
+        File dbFile = context.getDatabasePath(databaseName);
+
+        // Check if database file exists.  If not, return State.DOES_NOT_EXIST
+        if (dbFile.exists()) {
+
+            try {
+                // Declare input stream buffer variable.
+                byte[] data = new byte[16];
+
+                // Get instance of InputStream for the database file.
+                InputStream in = new FileInputStream(dbFile);
+
+                int offset = 0;
+                int bytesRead = 0;
+
+                // Read the first 16 bytes of the database file.
+                while ((bytesRead = in.read(data, offset, data.length - offset))
+                        != -1) {
+                    offset += bytesRead;
+                    if (offset >= data.length) {
+                        break;
+                    }
+                }
+
+                // Get the string from the input buffer.
+                // This string contains the first 16 bytes of the database file.
+                // In an unencrypted database, it should contain "SQLite format 3".
+                String dbHeader = new String(data, 0, offset, "UTF-8");
+
+                // Close the input stream
+                in.close();
+
+                // Check the string for its content.
+                if (dbHeader.equals("SQLite format 3"))
+                    return SQLCipherUtils.State.UNENCRYPTED;
+                else
+                    return SQLCipherUtils.State.ENCRYPTED;
+            } catch (Exception e) {
+                Timber.e("Failed to get database state!");
+
+                // In case of error, return ENCRYPTED.
+                // This is safer than trying to overwrite the database or re-encrypt it in the case that it is already encrypted
+                return SQLCipherUtils.State.ENCRYPTED;
+            }
+        }
+
+        return SQLCipherUtils.State.DOES_NOT_EXIST;
     }
 }
