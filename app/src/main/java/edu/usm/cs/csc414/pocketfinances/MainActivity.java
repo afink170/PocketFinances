@@ -138,10 +138,19 @@ public class MainActivity extends AppCompatActivity {
 
                         fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
 
+                        /*
                         fragmentTransaction
                                 .replace(fragmentHolder.getId(), new BudgetFragment(), "BudgetFragment")
                                 .addToBackStack(null)
                                 .commit();
+
+                        */
+
+                        fragmentTransaction
+                                .replace(fragmentHolder.getId(), new ViewPagerTestFragment(), "ViewPagerTestFragment")
+                                .addToBackStack(null)
+                                .commit();
+
                         activeFragmentId = R.id.nav_budget;
 
                     }

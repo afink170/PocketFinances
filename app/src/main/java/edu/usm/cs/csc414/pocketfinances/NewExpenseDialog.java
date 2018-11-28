@@ -289,45 +289,51 @@ public class NewExpenseDialog extends Dialog {
 
 
     private boolean tryToSave() {
-        if (expenseAmount.getText().toString().isEmpty()) {
-            showToastMessage("Error: Expense title and amount fields must be filled!");
-            return false;
-        }
-
-        String expenseTitleText = expenseTitle.getText().toString();
-        double expenseAmountText = Double.parseDouble(expenseAmount.getText().toString().substring(1).replace(",", ""));
-        boolean isRecurring = isRecurringCheckBox.isChecked();
-        RecurrenceRate recurrenceRate = RecurrenceRate.getRateFromText(recurrenceSpinner.getSelectedItem().toString());
-        ExpenseCategory category = ExpenseCategory.getCategoryFromText(categorySpinner.getSelectedItem().toString());
-        int activeAccount = -1;
-        for (int j = 0; j < bankAccounts.size(); j++) {
-            if (bankAccountSpinner.getSelectedItem() == bankAccounts.get(j).getAccountName())
-                activeAccount = bankAccounts.get(j).getAccountId();
-        }
-
-        double balanceChangeAmount = expenseAmountText * depositOrDeduction;
-
-        if (expenseTitleText.isEmpty() || expenseAmountText <= 0.0) {
-            showToastMessage("Error: Expense title and amount fields must be filled!");
-            return false;
-        } else if (activeAccount == -1) {
-            showToastMessage("Error: No bank account chosen for the expense!");
-            return false;
-        } else {
-            Expense newExpense = new Expense(activeAccount, expenseTitleText, category,
-                    expenseAmountText, trim(date), depositOrDeduction, isRecurring, recurrenceRate);
-
-            Timber.v(newExpense.toString());
-            new AsyncInsertExpense(getContext()).execute(newExpense);
-
-            if (!newExpense.getIsRecurring()) {
-                new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
-            }
-            else {
-                new AddRecurringExpensesTask((AppCompatActivity) activity).execute();
+        try {
+            if (expenseAmount.getText().toString().isEmpty() && expenseTitle.getText().toString().isEmpty()) {
+                showToastMessage("Error: Expense title and amount fields must be filled!");
+                return false;
             }
 
-            return true;
+            String expenseTitleText = expenseTitle.getText().toString();
+            double expenseAmountText = Double.parseDouble(expenseAmount.getText().toString().substring(1).replace(",", ""));
+            boolean isRecurring = isRecurringCheckBox.isChecked();
+            RecurrenceRate recurrenceRate = RecurrenceRate.getRateFromText(recurrenceSpinner.getSelectedItem().toString());
+            ExpenseCategory category = ExpenseCategory.getCategoryFromText(categorySpinner.getSelectedItem().toString());
+            int activeAccount = -1;
+            for (int j = 0; j < bankAccounts.size(); j++) {
+                if (bankAccountSpinner.getSelectedItem() == bankAccounts.get(j).getAccountName())
+                    activeAccount = bankAccounts.get(j).getAccountId();
+            }
+
+            double balanceChangeAmount = expenseAmountText * depositOrDeduction;
+
+            if (expenseTitleText.isEmpty() || expenseAmountText <= 0.0) {
+                showToastMessage("Error: Expense title and amount fields must be filled!");
+                return false;
+            } else if (activeAccount == -1) {
+                showToastMessage("Error: No bank account chosen for the expense!");
+                return false;
+            } else {
+                Expense newExpense = new Expense(activeAccount, expenseTitleText, category,
+                        expenseAmountText, trim(date), depositOrDeduction, isRecurring, recurrenceRate);
+
+                Timber.v(newExpense.toString());
+                new AsyncInsertExpense(getContext()).execute(newExpense);
+
+                if (!newExpense.getIsRecurring()) {
+                    new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
+                } else {
+                    new AddRecurringExpensesTask((AppCompatActivity) activity).execute();
+                }
+
+                return true;
+            }
+        }
+        catch (Exception e) {
+            Timber.e(e, "Failed to add new expense.");
+            showToastMessage("Error in adding new expense!");
+            return false;
         }
     }
 

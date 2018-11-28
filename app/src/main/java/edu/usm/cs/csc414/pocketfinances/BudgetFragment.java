@@ -36,7 +36,7 @@ public class BudgetFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_budget, container, false);
        pieChart = (PieChart) view.findViewById(R.id.idPieChart);
 
-        pieChart.setDescription("BUDGET");
+        //pieChart.setDescription("BUDGET");
         pieChart.setRotationEnabled(true);
         pieChart.setHoleRadius(25f);
         pieChart.setTransparentCircleAlpha(0);
