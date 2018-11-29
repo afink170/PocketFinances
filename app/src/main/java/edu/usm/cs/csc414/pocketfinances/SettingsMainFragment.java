@@ -80,6 +80,7 @@ public class SettingsMainFragment extends Fragment {
 
     private void setSpinnerAdapters() {
         // TODO : Set spinner adapter for background spinner here
+        // The list of resource Id's
     }
 
     private void setListeners() {

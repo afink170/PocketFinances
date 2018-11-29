@@ -20,6 +20,7 @@ import timber.log.Timber;
 public class PasswordActivity extends AppCompatActivity {
 
     FragmentTransaction fragmentTransaction;
+    CustomSharedPreferences sharedPrefs;
 
     // Declare Ui elements
         FrameLayout fragmentHolder;
@@ -30,6 +31,8 @@ public class PasswordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedPrefs = new CustomSharedPreferences(getApplicationContext());
 
         // Redirect user to different starting activity if necessary
         handleStartingActivity();
@@ -42,11 +45,11 @@ public class PasswordActivity extends AppCompatActivity {
 
         try {
             // Set chosen background from sharedPrefs
-            background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
         }
         catch (Exception e) {
-            new CustomSharedPreferences(getApplicationContext()).setActivityBackground(CustomSharedPreferences.BACKGROUND_LIGHTBLUE);
-            background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
+            sharedPrefs.setActivityBackground(Background.DARK_GREY);
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
         }
 
         // Allow the app window to fill the entire screen
@@ -60,7 +63,7 @@ public class PasswordActivity extends AppCompatActivity {
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
         // Load the home fragment into the frame layout in the UI
-        if (new CustomSharedPreferences(getApplicationContext()).getFingerprintEnabled()) {
+        if (sharedPrefs.getFingerprintEnabled()) {
             fragmentTransaction
                     .replace(fragmentHolder.getId(), new FingerprintFragment())
                     .commit();
@@ -107,11 +110,6 @@ public class PasswordActivity extends AppCompatActivity {
     }
 
     private void handleStartingActivity() {
-
-
-        //------------------------ INIT SHARED PREFERENCES -----------------------------
-        // declare and initialize shared preferences
-        CustomSharedPreferences sharedPrefs = new CustomSharedPreferences(this);
 
         if (sharedPrefs.getIsFirstRun()) {
             // Launch WelcomeActivity, which walks the user through the app and allows them to set up basic settings/features

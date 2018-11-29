@@ -37,10 +37,6 @@ public class CustomSharedPreferences {
     public static final int THEME_DARK = 1;
     public static final int THEME_LIGHT = 0;
 
-    public static final int BACKGROUND_SPACE = R.drawable.background_space;
-    public static final int BACKGROUND_DARKGREY = R.drawable.background_dark;
-    public static final int BACKGROUND_LIGHTBLUE = R.drawable.background_lightblue;
-
     private static final String KEYSTORE_ENCRYPT_ALIAS = "encrypt_alias";
 
     private SharedPreferences sharedPrefs;
@@ -340,31 +336,31 @@ public class CustomSharedPreferences {
 
 
     /**
-     * Gets the resource ID of the chosen background for the app.
+     * Gets the chosen background for the app.
      *
-     * @return Integer ID of the background.
+     * @return the object referring to the chosen background.
      */
-    public int getActivityBackground() {
-        int background = sharedPrefs.getInt(PREFS_ACTIVITY_BACKGROUND, BACKGROUND_DARKGREY);
+    public Background getActivityBackground() {
+        int backgroundId = sharedPrefs.getInt(PREFS_ACTIVITY_BACKGROUND, Background.DARK_GREY.getResourceId());
 
-        if (background == BACKGROUND_LIGHTBLUE)
+        if (backgroundId == Background.LIGHT_BLUE.getResourceId())
             setActivityTheme(THEME_LIGHT);
         else
             setActivityTheme(THEME_DARK);
 
-        return  background;
+        return  Background.getById(backgroundId);
     }
 
 
     /**
      * Stores the resource ID of the chosen background for the app in shared preferences.
      *
-     * @param background Integer ID of the background.
+     * @param background The chosen background object.
      */
-    public void setActivityBackground(int background) {
-        sharedPrefs.edit().putInt(PREFS_ACTIVITY_BACKGROUND, background).apply();
+    public void setActivityBackground(Background background) {
+        sharedPrefs.edit().putInt(PREFS_ACTIVITY_BACKGROUND, background.getResourceId()).apply();
 
-        if (background == BACKGROUND_LIGHTBLUE)
+        if (background == Background.LIGHT_BLUE)
             setActivityTheme(THEME_LIGHT);
         else
             setActivityTheme(THEME_DARK);

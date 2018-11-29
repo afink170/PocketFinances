@@ -62,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             // Set chosen background from sharedPrefs
-            background.setImageResource(sharedPrefs.getActivityBackground());
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
         }
         catch (Exception e) {
-            sharedPrefs.setActivityBackground(CustomSharedPreferences.BACKGROUND_DARKGREY);
-            background.setImageResource(sharedPrefs.getActivityBackground());
+            sharedPrefs.setActivityBackground(Background.DARK_GREY);
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
         }
 
         // Set bottom padding to the layout so that any present soft keys don't overlap the nav bar

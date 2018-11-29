@@ -40,8 +40,8 @@ public class WelcomeActivity extends AppCompatActivity {
         nextButton = findViewById(R.id.activity_welcome_next_textview);
         background = findViewById(R.id.activity_welcome_background);
 
-        new CustomSharedPreferences(getApplicationContext()).setActivityBackground(CustomSharedPreferences.BACKGROUND_DARKGREY);
-        background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
+        new CustomSharedPreferences(getApplicationContext()).setActivityBackground(Background.DARK_GREY);
+        background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground().getResourceId());
 
         // Set bottom padding to the layout so that any present soft keys don't overlap the nav bar
         setBottomPadding();
