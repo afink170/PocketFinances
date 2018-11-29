@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +56,15 @@ public class SettingsMainFragment extends Fragment {
         // Set initial state of each setting item.
         // For example, set the default selected item for the background spinner here.
         // TODO : Set backgroundSpinner initial state
+        //setSelection
+
+        Background background = sharedPrefs.getActivityBackground();
+        backgroundSpinner.setSelection(0);
+        for(int i = 0; i < Background.getBackgroundList().size(); i++) {
+            if(Background.getBackgroundList().get(i).getResourceId() == background.getResourceId()) {
+                backgroundSpinner.setSelection(i);
+            }
+        }
 
 
         // Set default selected item for defaultAccountSpinner
@@ -79,8 +89,18 @@ public class SettingsMainFragment extends Fragment {
 
 
     private void setSpinnerAdapters() {
-        // TODO : Set spinner adapter for background spinner here
         // The list of resource Id's
+
+        ArrayList<String> backgroundArray = new ArrayList<>();
+
+        for(Background background : Background.getBackgroundList()) {
+            backgroundArray.add(background.getName());
+        }
+
+        ArrayAdapter<String> backgroundArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, backgroundArray);
+
+
+        backgroundSpinner.setAdapter(backgroundArrayAdapter);
     }
 
     private void setListeners() {
@@ -89,6 +109,20 @@ public class SettingsMainFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // Handle selection here
                 // i refers to the array index of the background that was selected.
+                try {
+                    sharedPrefs.setActivityBackground(Background.getBackgroundList().get(i));
+                }
+                catch (Exception e) {
+                    sharedPrefs.setActivityBackground(Background.DARK_GREY);
+                    Timber.e(e, "Background not set");
+                }
+
+                try {
+                    ((SettingsActivity) getActivity()).reloadActivityBackground();
+                }
+                catch (Exception e) {
+                    Timber.e(e, "Background not changed on select");
+                }
             }
 
             @Override

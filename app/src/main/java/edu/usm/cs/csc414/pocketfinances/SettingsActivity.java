@@ -102,4 +102,15 @@ public class SettingsActivity extends AppCompatActivity {
         int realHeight = metrics.heightPixels;
         return realHeight - usableHeight;
     }
+
+    public void reloadActivityBackground() {
+        try {
+            // Set chosen background from sharedPrefs
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
+        }
+        catch (Exception e) {
+            sharedPrefs.setActivityBackground(Background.DARK_GREY);
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
+        }
+    }
 }
