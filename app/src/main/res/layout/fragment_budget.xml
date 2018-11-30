@@ -4,4 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <fr.castorflex.android.verticalviewpager.VerticalViewPager
+        android:id="@+id/fragment_budget_viewpager_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="10dp">
+
+        <!-- Add graph fragments here -->
+
+    </fr.castorflex.android.verticalviewpager.VerticalViewPager>
+
 </android.support.constraint.ConstraintLayout>

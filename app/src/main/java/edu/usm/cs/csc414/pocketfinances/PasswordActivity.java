@@ -12,19 +12,19 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.spongycastle.crypto.params.KeyParameter;
+import com.crashlytics.android.Crashlytics;
+
+import timber.log.Timber;
 
 
 public class PasswordActivity extends AppCompatActivity {
 
-    private static final String TAG = "PasswordActivity";
-
     FragmentTransaction fragmentTransaction;
+    CustomSharedPreferences sharedPrefs;
 
     // Declare Ui elements
-    FrameLayout fragmentHolder;
-    ImageView background;
+        FrameLayout fragmentHolder;
+        ImageView background;
 
 
 
@@ -32,26 +32,38 @@ public class PasswordActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        sharedPrefs = new CustomSharedPreferences(getApplicationContext());
+
         // Redirect user to different starting activity if necessary
         handleStartingActivity();
 
-
         setContentView(R.layout.activity_password);
 
+        // Initialize UI elements
         fragmentHolder = findViewById(R.id.activity_password_framelayout);
         background = findViewById(R.id.activity_password_background);
 
-        background.setImageResource(new CustomSharedPreferences(getApplicationContext()).getActivityBackground());
+        try {
+            // Set chosen background from sharedPrefs
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
+        }
+        catch (Exception e) {
+            sharedPrefs.setActivityBackground(Background.DARK_GREY);
+            background.setImageResource(sharedPrefs.getActivityBackground().getResourceId());
+        }
 
+        // Allow the app window to fill the entire screen
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-        setNavMenuPadding();
+        // Set bottom padding to the layout so that any present soft keys don't overlap the fragment holder
+        setFragmentHolderPadding();
 
         // Load the home fragment into the frame layout in the UI
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
-        if (new CustomSharedPreferences(getApplicationContext()).getFingerprintEnabled()) {
+        // Load the home fragment into the frame layout in the UI
+        if (sharedPrefs.getFingerprintEnabled()) {
             fragmentTransaction
                     .replace(fragmentHolder.getId(), new FingerprintFragment())
                     .commit();
@@ -64,20 +76,30 @@ public class PasswordActivity extends AppCompatActivity {
     }
 
 
-    private void setNavMenuPadding() {
-        Log.v(TAG, "Checking for soft keys.");
+    /**
+     * Method for handling the window size for the activity.
+     * The activity should span the entire screen, including the space behind any potential soft keys.
+     * Therefore, we need to add bottom padding to the fragmentHolder so that it floats above the soft keys, not behind it.
+     */
+    private void setFragmentHolderPadding() {
+        Timber.v("Checking for soft keys.");
         try {
             int softKeyBarHeight = getSoftButtonsBarHeight();
-            Log.d(TAG, "Soft key bar height: " + softKeyBarHeight);
+            Timber.d("Soft key bar height: %d", softKeyBarHeight);
 
             fragmentHolder.setPadding(0,0,0, softKeyBarHeight);
 
         } catch(Exception e) {
-            Log.e(TAG, "Error in checking presence of soft keys and adapting UI accordingly.", e);
+            Timber.e(e, "Error in checking presence of soft keys and adapting UI accordingly.");
         }
     }
 
 
+    /**
+     * Method for getting the height of the soft key bar, if it exists on the device.
+     *
+     * @return The height in pixels of soft key bar, if present.  Otherwise, returns 0.
+     */
     private int getSoftButtonsBarHeight() {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -88,11 +110,6 @@ public class PasswordActivity extends AppCompatActivity {
     }
 
     private void handleStartingActivity() {
-
-
-        //------------------------ INIT SHARED PREFERENCES -----------------------------
-        // declare and initialize shared preferences
-        CustomSharedPreferences sharedPrefs = new CustomSharedPreferences(this);
 
         if (sharedPrefs.getIsFirstRun()) {
             // Launch WelcomeActivity, which walks the user through the app and allows them to set up basic settings/features

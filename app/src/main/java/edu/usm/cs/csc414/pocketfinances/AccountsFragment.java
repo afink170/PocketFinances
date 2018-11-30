@@ -24,12 +24,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class AccountsFragment extends Fragment {
-
-    private static final String TAG = "AccountsFragment";
-
-    // Declare Typeface for custom font
-    Typeface FONT_WALKWAY;
 
     // Declare UI elements
     TextView titleText;
@@ -43,7 +40,7 @@ public class AccountsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "Attempting to create AccountsFragment.");
+        Timber.d("Attempting to create AccountsFragment.");
         View view = inflater.inflate(R.layout.fragment_accounts, container, false);
 
         // Initialize UI elements for fragment
@@ -55,7 +52,7 @@ public class AccountsFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.fragment_accounts_recyclerview);
 
         // Create the RecyclerViewAdapter for the RecyclerView
-        recyclerViewAdapter = new AccountsRecyclerViewAdapter(new ArrayList<BankAccount>());
+        recyclerViewAdapter = new AccountsRecyclerViewAdapter(new ArrayList<>());
 
         // Set the LayoutManager to be the LinearLayoutManager
         // This makes the list display linearly
@@ -70,12 +67,8 @@ public class AccountsFragment extends Fragment {
 
         // Set the ViewModel to observe the live BankAccount data list
         //      so that the UI will update whenever the data or config changes
-        viewModel.getBankAccountsList().observe(getActivity(), new Observer<List<BankAccount>>() {
-            @Override
-            public void onChanged(@Nullable List<BankAccount> bankAccountList) {
-                recyclerViewAdapter.addItems(bankAccountList);
-            }
-        });
+        viewModel.getBankAccountsList().observe(getActivity(), bankAccountList ->
+                recyclerViewAdapter.addItems(bankAccountList));
 
 
         // set the listeners for any UI elements that need them
@@ -90,98 +83,79 @@ public class AccountsFragment extends Fragment {
 
     // Method for setting all the listeners
     private void setListeners() {
-        addAccountBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
+        addAccountBtn.setOnClickListener(view -> {
 
-                newAccountDialog = new AlertDialog.Builder(getActivity());
+            newAccountDialog = new AlertDialog.Builder(getActivity());
 
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-                View alertDialogView = inflater.inflate(R.layout.dialog_bankaccount_new, null);
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View alertDialogView = inflater.inflate(R.layout.dialog_bankaccount_new, null);
 
-                final EditText accountName = alertDialogView.findViewById(R.id.dialog_bankaccount_new_accountname);
-                final EditText bankName = alertDialogView.findViewById(R.id.dialog_bankaccount_new_bankname);
-                final EditText accountType = alertDialogView.findViewById(R.id.dialog_bankaccount_new_accounttype);
-                final EditText accountBalance = alertDialogView.findViewById(R.id.dialog_bankaccount_new_balance);
+            final EditText accountName = alertDialogView.findViewById(R.id.dialog_bankaccount_new_accountname);
+            final EditText bankName = alertDialogView.findViewById(R.id.dialog_bankaccount_new_bankname);
+            final EditText accountType = alertDialogView.findViewById(R.id.dialog_bankaccount_new_accounttype);
+            final EditText accountBalance = alertDialogView.findViewById(R.id.dialog_bankaccount_new_balance);
 
-                newAccountDialog.setTitle("New Bank Account");
-                newAccountDialog.setCancelable(true);
-                newAccountDialog.setView(alertDialogView);
+            newAccountDialog.setTitle("New Bank Account");
+            newAccountDialog.setCancelable(true);
+            newAccountDialog.setView(alertDialogView);
 
-                newAccountDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        try {
-                            String accountNameText = accountName.getText().toString();
-                            String bankNameText = bankName.getText().toString();
-                            String accountTypeText = accountType.getText().toString();
-                            String accountBalanceText = accountBalance.getText().toString();
+            newAccountDialog.setPositiveButton("Save", (dialogInterface, i) -> {
+                try {
+                    String accountNameText = accountName.getText().toString();
+                    String bankNameText = bankName.getText().toString();
+                    String accountTypeText = accountType.getText().toString();
+                    String accountBalanceText = accountBalance.getText().toString();
 
-                            if (accountNameText.equals("") || bankNameText.equals("")
-                                    || accountTypeText.equals("") || accountBalanceText.equals("")) {
-                                showToastMessage("Error: All fields must be filled.");
-                            }
-                            else {
-                                BankAccount newAccount = new BankAccount(bankNameText, accountNameText,
-                                        accountTypeText, Double.parseDouble(accountBalanceText));
-
-                                viewModel.insertItem(newAccount);
-
-                                dialogInterface.cancel();
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, "Failed to get user input from AlertDialog.", e);
-                            showToastMessage("Error: Failed to get user input.");
-                            dialogInterface.cancel();
-                        }
+                    if (accountNameText.equals("") || bankNameText.equals("")
+                            || accountTypeText.equals("") || accountBalanceText.equals("")) {
+                        showToastMessage("Error: All fields must be filled.");
                     }
-                });
+                    else {
+                        BankAccount newAccount = new BankAccount(bankNameText, accountNameText,
+                                accountTypeText, Double.parseDouble(accountBalanceText));
 
-                newAccountDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                        viewModel.insertItem(newAccount);
+
                         dialogInterface.cancel();
                     }
-                });
+                } catch (Exception e) {
+                    Timber.e(e, "Failed to get user input from AlertDialog.");
+                    showToastMessage("Error: Failed to get user input.");
+                    dialogInterface.cancel();
+                }
+            });
 
-                newAccountDialog.show();
-            }
+            newAccountDialog.setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
+
+            newAccountDialog.show();
         });
 
 
-        recyclerViewAdapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int itemPosition = recyclerView.getChildLayoutPosition(view);
-                BankAccount clickedAccount = viewModel.getBankAccountsList().getValue().get(itemPosition);
+        recyclerViewAdapter.setOnClickListener(view -> {
+            int itemPosition = recyclerView.getChildLayoutPosition(view);
+            BankAccount clickedAccount = viewModel.getBankAccountsList().getValue().get(itemPosition);
 
-                Bundle bundle = new Bundle();
-                bundle.putInt("activeAccountId", clickedAccount.getAccountId());
+            Bundle bundle = new Bundle();
+            bundle.putInt("activeAccountId", clickedAccount.getAccountId());
 
-                //showToastMessage(clickedAccount.getAccountName() + " clicked!");
+            ExpensesFragment expensesFragment = new ExpensesFragment();
+            expensesFragment.setArguments(bundle);
 
-                ExpensesFragment expensesFragment = new ExpensesFragment();
-                expensesFragment.setArguments(bundle);
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
+            fragmentTransaction.replace(R.id.activity_main_framelayout, expensesFragment)
+                    .commit();
 
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-                fragmentTransaction.replace(R.id.activity_main_framelayout, expensesFragment)
-                        .commit();
-
-            }
         });
 
-        recyclerViewAdapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                int itemPosition = recyclerView.getChildLayoutPosition(view);
-                BankAccount clickedAccount = viewModel.getBankAccountsList().getValue().get(itemPosition);
+        recyclerViewAdapter.setOnLongClickListener(view -> {
+            int itemPosition = recyclerView.getChildLayoutPosition(view);
+            BankAccount clickedAccount = viewModel.getBankAccountsList().getValue().get(itemPosition);
 
-                EditDeleteAccountDialog dialog = new EditDeleteAccountDialog(getActivity(), viewModel, clickedAccount);
-                dialog.show();
+            EditDeleteAccountDialog dialog = new EditDeleteAccountDialog(getActivity(), viewModel, clickedAccount);
+            dialog.show();
 
-                return true;
-            }
+            return true;
         });
     }
 

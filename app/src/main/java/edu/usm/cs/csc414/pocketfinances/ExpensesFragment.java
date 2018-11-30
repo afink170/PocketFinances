@@ -22,12 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import timber.log.Timber;
+
 public class ExpensesFragment extends Fragment {
-
-    private static final String TAG = "ExpensesFragment";
-
-    // Declare Typeface for custom font
-    Typeface FONT_WALKWAY;
 
     // Declare UI elements
     TextView titleTextView, parentAccountBalanceTextView;
@@ -43,7 +40,7 @@ public class ExpensesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(TAG, "Attempting to create ExpensesFragment.");
+        Timber.v("Attempting to create ExpensesFragment.");
 
         View view = inflater.inflate(R.layout.fragment_expenses, container, false);
 
@@ -56,13 +53,13 @@ public class ExpensesFragment extends Fragment {
         try {
             activeAccountId = getArguments().getInt("activeAccountId");
 
-            Log.d(TAG, "Parent account id: " + activeAccountId);
+            Timber.d("Parent account id: %d", activeAccountId);
 
             BankAccountsViewModel accountsViewModel = ViewModelProviders.of(this).get(BankAccountsViewModel.class);
 
             observeActiveAccount(accountsViewModel);
         } catch(Exception e) {
-            Log.e(TAG, "Unable to get bank account ID.", e);
+            Timber.e(e, "Unable to get bank account ID.");
             getActivity().getSupportFragmentManager().popBackStack();
         }
 
@@ -71,7 +68,7 @@ public class ExpensesFragment extends Fragment {
         recyclerView = view.findViewById(R.id.fragment_expenses_recyclerview);
 
         // Create the RecyclerViewAdapter for the RecyclerView
-        recyclerViewAdapter = new ExpensesRecyclerViewAdapter(new ArrayList<Expense>());
+        recyclerViewAdapter = new ExpensesRecyclerViewAdapter(new ArrayList<>());
 
         // Set the LayoutManager to be the LinearLayoutManager
         // This makes the list display linearly
@@ -87,12 +84,9 @@ public class ExpensesFragment extends Fragment {
 
         // Set the ViewModel to observe the live BankAccount data list
         //      so that the UI will update whenever the data or config changes
-        viewModel.getExpensesList().observe(getActivity(), new Observer<List<Expense>>() {
-            @Override
-            public void onChanged(@Nullable List<Expense> expenseList) {
-                Log.d(TAG, "Expenses received.  Populating RecyclerView.");
-                recyclerViewAdapter.addItems(expenseList);
-            }
+        viewModel.getExpensesList().observe(getActivity(), expenseList -> {
+            Timber.d("Expenses received.  Populating RecyclerView.");
+            recyclerViewAdapter.addItems(expenseList);
         });
 
         // set the listeners for any UI elements that need them
@@ -105,62 +99,50 @@ public class ExpensesFragment extends Fragment {
 
     // Method for setting all the listeners
     private void setListeners() {
-        addExpenseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                NewExpenseDialog newExpenseDialog = new NewExpenseDialog(getActivity(), activeAccountId);
-                newExpenseDialog.show();
-            }
+        addExpenseBtn.setOnClickListener(view -> {
+            NewExpenseDialog newExpenseDialog = new NewExpenseDialog(getActivity(), activeAccountId);
+            newExpenseDialog.show();
         });
 
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AccountsFragment accountsFragment = new AccountsFragment();
+        backBtn.setOnClickListener(view -> {
+            AccountsFragment accountsFragment = new AccountsFragment();
 
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(R.animator.slide_right_left_in, R.animator.slide_right_left_out);
-                fragmentTransaction
-                        .replace(R.id.activity_main_framelayout, accountsFragment)
-                        .commit();
-            }
+            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(R.animator.slide_right_left_in, R.animator.slide_right_left_out);
+            fragmentTransaction
+                    .replace(R.id.activity_main_framelayout, accountsFragment)
+                    .commit();
         });
 
-        recyclerViewAdapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                int itemPosition = recyclerView.getChildLayoutPosition(view);
-                Expense clickedExpense = viewModel.getExpensesList().getValue().get(itemPosition);
+        recyclerViewAdapter.setOnLongClickListener(view -> {
+            int itemPosition = recyclerView.getChildLayoutPosition(view);
+            Expense clickedExpense = viewModel.getExpensesList().getValue().get(itemPosition);
 
-                EditDeleteExpenseDialog editDeleteExpenseDialog = new EditDeleteExpenseDialog(getActivity(), viewModel,clickedExpense);
-                editDeleteExpenseDialog.show();
-                return true;
-            }
+            EditDeleteExpenseDialog editDeleteExpenseDialog = new EditDeleteExpenseDialog(getActivity(), viewModel,clickedExpense);
+            editDeleteExpenseDialog.show();
+            return true;
         });
     }
 
 
     private void observeActiveAccount(BankAccountsViewModel accountsViewModel) {
-        accountsViewModel.getBankAccount(activeAccountId).observe(this, new Observer<BankAccount>() {
-            @Override
-            public void onChanged(@Nullable BankAccount bankAccount) {
-                if (bankAccount.getAccountBalance() < 0.0) {
-                    parentAccountBalanceTextView.setText(String.format(Locale.US, "-$%.2f", Math.abs(bankAccount.getAccountBalance())));
-                    parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorRed));
-                }
+        if (activeAccountId != -1) {
+            accountsViewModel.getBankAccount(activeAccountId).observe(this, bankAccount -> {
+                try {
+                    if (bankAccount.getAccountBalance() < 0.0) {
+                        parentAccountBalanceTextView.setText(String.format(Locale.US, "-$%.2f", Math.abs(bankAccount.getAccountBalance())));
+                        parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorRed));
+                    }
                     else {
-                    parentAccountBalanceTextView.setText(String.format(Locale.US, "$%.2f", bankAccount.getAccountBalance()));
-                    parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                        parentAccountBalanceTextView.setText(String.format(Locale.US, "$%.2f", bankAccount.getAccountBalance()));
+                        parentAccountBalanceTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                    }
+                    titleTextView.setText(bankAccount.getAccountName());
                 }
-                titleTextView.setText(bankAccount.getAccountName());
-            }
-
-        });
-    }
-
-
-    private void showToastMessage(String message) {
-        Toast.makeText(getActivity().getBaseContext(), message,
-                Toast.LENGTH_SHORT).show();
+                catch(NullPointerException e) {
+                    Timber.e(e, "Failed to observer active account balance!");
+                }
+            });
+        }
     }
 }

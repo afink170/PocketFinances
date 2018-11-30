@@ -5,6 +5,8 @@
     <color name="colorAccent">#303F9F</color>
     <color name="colorFont">#ffffff</color>
     <color name="colorWhite">#ffffff</color>
+    <color name="colorDarkGrey">#3e3e3e</color>
+    <color name="colorTransparent">#00ffffff</color>
     <color name="colorLightGreyTransparent">#77a4a4a4</color>
     <color name="colorDarkGreyTransparent">#77383838</color>
     <color name="colorWhiteTransparent">#77ffffff</color>
@@ -14,4 +16,5 @@
     <color name="colorGreen">#006e00</color>
     <color name="dialogBackgroundColor">#292929</color>
     <color name="colorDisabledButton">#8b8b8b</color>
+    <color name="titleBarBlue">#191966</color>
 </resources>

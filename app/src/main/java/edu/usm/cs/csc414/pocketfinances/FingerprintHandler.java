@@ -19,17 +19,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import timber.log.Timber;
+
 @TargetApi(Build.VERSION_CODES.M)
 @SuppressWarnings("ALL")
 public class FingerprintHandler extends FingerprintManager.AuthenticationCallback {
-
-    private static final String TAG = "FingerprintHandler";
 
     // Must use CancellationSignal whenever fingerprint scanner is no longer needed.  Otherwise, other apps will not be able to use it.
     private CancellationSignal cancellationSignal;
     private Context context;
     private FragmentActivity activity;
     private View view;
+    private int theme;
 
     private int failCount = 0;
     private final int maxFails = 3;
@@ -42,9 +43,12 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
         this.context = context;
         this.activity = activity;
         this.view = view;
+        this.theme = new CustomSharedPreferences(context).getActivityTheme();
 
         messageTextView = view.findViewById(R.id.fragment_fingerprint_messagetext);
         fingerprintImageView = view.findViewById(R.id.fragment_fingerprint_image);
+
+        setDefaultUI();
     }
 
 
@@ -70,7 +74,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     // is called when a fatal error has occurred.
     @Override
     public void onAuthenticationError(int errMsgId, CharSequence errString) {
-        Log.e(TAG, (String)errString);
+        Timber.e((String)errString);
     }
 
 
@@ -84,7 +88,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
 
         waitThenResetUI(2);
 
-        Log.e(TAG, "Fingerprint authentication failed!");
+        Timber.i("Fingerprint authentication failed!");
 
         failCount++;
 
@@ -102,7 +106,7 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     // is called when a non-fatal error has occurred. This method provides additional information about the error
     @Override
     public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
-        Log.e(TAG, "Authentication help:  " + helpString);
+        Timber.i("Authentication help:  %s", helpString);
     }
 
 
@@ -111,14 +115,14 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
         cancellationSignal.cancel();
 
-        Log.i(TAG, "Fingerprint recognized!");
+        Timber.i("Fingerprint recognized!");
 
         fingerprintImageView.setImageDrawable(activity.getDrawable(R.drawable.ic_fingerprint_green));
         messageTextView.setTextColor(activity.getColor(R.color.colorGreen));
         messageTextView.setText("Fingerprint recognized!");
 
-        // Launch MainActivity
-        Intent intent = new Intent(activity, MainActivity.class);
+        // Launch SplashActivity
+        Intent intent = new Intent(activity, SplashActivity.class);
         activity.startActivity(intent);
         activity.finish();
     }
@@ -130,11 +134,22 @@ public class FingerprintHandler extends FingerprintManager.AuthenticationCallbac
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                fingerprintImageView.setImageDrawable(activity.getDrawable(R.drawable.ic_fingerprint_white));
-                messageTextView.setTextColor(activity.getColor(R.color.colorWhite));
-                messageTextView.setText(activity.getText(R.string.fingerprintauth_message_default));
+                setDefaultUI();
             }
         }, (int)(seconds * 1000));
+    }
+
+
+    private void setDefaultUI() {
+        if (theme == CustomSharedPreferences.THEME_DARK) {
+            fingerprintImageView.setImageDrawable(activity.getDrawable(R.drawable.ic_fingerprint_white));
+            messageTextView.setTextColor(activity.getColor(R.color.colorWhite));
+        }
+        else if (theme == CustomSharedPreferences.THEME_LIGHT) {
+            fingerprintImageView.setImageDrawable(activity.getDrawable(R.drawable.ic_fingerprint_dark));
+            messageTextView.setTextColor(activity.getColor(R.color.colorDarkGrey));
+        }
+        messageTextView.setText(activity.getText(R.string.fingerprintauth_message_default));
     }
 
 

@@ -33,9 +33,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class NewExpenseDialog extends Dialog {
+import timber.log.Timber;
 
-    private final String TAG = getClass().getSimpleName();
+public class NewExpenseDialog extends Dialog {
 
     private Activity activity;
     private int accountId;
@@ -160,59 +160,35 @@ public class NewExpenseDialog extends Dialog {
 
     private void setListeners() {
 
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
+        cancelBtn.setOnClickListener(view -> dismiss());
+
+        saveBtn.setOnClickListener(view -> {
+            if (tryToSave()) dismiss();
         });
 
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (tryToSave()) dismiss();
-            }
+        isRecurringCheckBox.setOnCheckedChangeListener((compoundButton, b) -> recurrenceSpinner.setEnabled(b));
+
+        isDeposit.setOnClickListener(view -> {
+            depositOrDeduction = Expense.DEPOSIT;
+            setDepositDeductionColors();
         });
 
-        isRecurringCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                recurrenceSpinner.setEnabled(b);
-            }
+        isDeduction.setOnClickListener(view -> {
+            depositOrDeduction = Expense.DEDUCT;
+            setDepositDeductionColors();
         });
 
-        isDeposit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                depositOrDeduction = Expense.DEPOSIT;
-                setDepositDeductionColors();
-            }
-        });
+        expenseDate.setOnClickListener(view -> {
 
-        isDeduction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                depositOrDeduction = Expense.DEDUCT;
-                setDepositDeductionColors();
-            }
-        });
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                    AlertDialog.THEME_HOLO_LIGHT, (datePicker, year, monthOfYear, dayOfMonth) -> {
+                date.set(Calendar.YEAR, year);
+                date.set(Calendar.MONTH, monthOfYear);
+                date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-        expenseDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                        date.set(Calendar.YEAR, year);
-                        date.set(Calendar.MONTH, monthOfYear);
-                        date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-                        expenseDate.setText(ExpenseTypeConverters.dateToString(date));
-                    }
-                }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.show();
-            }
+                expenseDate.setText(ExpenseTypeConverters.dateToString(date));
+            }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.show();
         });
 
         expenseAmount.addTextChangedListener(new MoneyTextWatcher(expenseAmount));
@@ -284,78 +260,80 @@ public class NewExpenseDialog extends Dialog {
 
     private void observeAccounts() {
         BankAccountsViewModel accountsViewModel =  new BankAccountsViewModel(activity.getApplication());
-        accountsViewModel.getBankAccountsList().observe((LifecycleOwner) activity, new Observer<List<BankAccount>>() {
-            @Override
-            public void onChanged(@Nullable List<BankAccount> bankAccountsList) {
-                bankAccounts = bankAccountsList;
+        accountsViewModel.getBankAccountsList().observe((LifecycleOwner) activity, bankAccountsList -> {
+            bankAccounts = bankAccountsList;
 
-                ArrayList<String> bankAccountArrayList = new ArrayList<>();
+            ArrayList<String> bankAccountArrayList = new ArrayList<>();
 
-                if (bankAccounts != null) {
-                    for (BankAccount account : bankAccounts) {
-                        bankAccountArrayList.add(account.getAccountName());
-                    }
-                }
-                else {
-                    showToastMessage("You must add a bank account first!");
-                    cancel();
-                }
-
-                ArrayAdapter<String> bankAccountArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, bankAccountArrayList);
-                bankAccountSpinner.setAdapter(bankAccountArrayAdapter);
-
-                for (int  i = 0; i < bankAccounts.size(); i++) {
-                    if (accountId == bankAccounts.get(i).getAccountId()) {
-                        bankAccountSpinner.setSelection(i);
-                    }
-
+            if (bankAccounts != null) {
+                for (BankAccount account : bankAccounts) {
+                    bankAccountArrayList.add(account.getAccountName());
                 }
             }
+            else {
+                showToastMessage("You must add a bank account first!");
+                cancel();
+            }
 
+            ArrayAdapter<String> bankAccountArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, bankAccountArrayList);
+            bankAccountSpinner.setAdapter(bankAccountArrayAdapter);
+
+            for (int  i = 0; i < bankAccounts.size(); i++) {
+                if (accountId == bankAccounts.get(i).getAccountId()) {
+                    bankAccountSpinner.setSelection(i);
+                }
+
+            }
         });
     }
 
 
     private boolean tryToSave() {
-        if (expenseAmount.getText().toString().isEmpty()) {
-            showToastMessage("Error: Expense title and amount fields must be filled!");
-            return false;
-        }
-
-        String expenseTitleText = expenseTitle.getText().toString();
-        double expenseAmountText = Double.parseDouble(expenseAmount.getText().toString().substring(1).replace(",", ""));
-        boolean isRecurring = isRecurringCheckBox.isChecked();
-        RecurrenceRate recurrenceRate = RecurrenceRate.getRateFromText(recurrenceSpinner.getSelectedItem().toString());
-        ExpenseCategory category = ExpenseCategory.getCategoryFromText(categorySpinner.getSelectedItem().toString());
-        int activeAccount = -1;
-        for (int j = 0; j < bankAccounts.size(); j++) {
-            if (bankAccountSpinner.getSelectedItem() == bankAccounts.get(j).getAccountName())
-                activeAccount = bankAccounts.get(j).getAccountId();
-        }
-
-        double balanceChangeAmount = expenseAmountText * depositOrDeduction;
-
-        if (expenseTitleText.isEmpty() || expenseAmountText <= 0.0) {
-            showToastMessage("Error: Expense title and amount fields must be filled!");
-            return false;
-        } else if (activeAccount == -1) {
-            showToastMessage("Error: No bank account chosen for the expense!");
-            return false;
-        } else {
-            Expense newExpense = new Expense(activeAccount, expenseTitleText, category,
-                    expenseAmountText, trim(date), depositOrDeduction, isRecurring, recurrenceRate);
-
-            Log.v(TAG, newExpense.toString());
-            new AsyncInsertExpense(getContext()).execute(newExpense);
-
-            if (!newExpense.getIsRecurring()) {
-                new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
-            }
-            else {
-                new AddRecurringExpensesTask((AppCompatActivity) activity).execute();
+        try {
+            if (expenseAmount.getText().toString().isEmpty() && expenseTitle.getText().toString().isEmpty()) {
+                showToastMessage("Error: Expense title and amount fields must be filled!");
+                return false;
             }
 
-            return true;
+            String expenseTitleText = expenseTitle.getText().toString();
+            double expenseAmountText = Double.parseDouble(expenseAmount.getText().toString().substring(1).replace(",", ""));
+            boolean isRecurring = isRecurringCheckBox.isChecked();
+            RecurrenceRate recurrenceRate = RecurrenceRate.getRateFromText(recurrenceSpinner.getSelectedItem().toString());
+            ExpenseCategory category = ExpenseCategory.getCategoryFromText(categorySpinner.getSelectedItem().toString());
+            int activeAccount = -1;
+            for (int j = 0; j < bankAccounts.size(); j++) {
+                if (bankAccountSpinner.getSelectedItem() == bankAccounts.get(j).getAccountName())
+                    activeAccount = bankAccounts.get(j).getAccountId();
+            }
+
+            double balanceChangeAmount = expenseAmountText * depositOrDeduction;
+
+            if (expenseTitleText.isEmpty() || expenseAmountText <= 0.0) {
+                showToastMessage("Error: Expense title and amount fields must be filled!");
+                return false;
+            } else if (activeAccount == -1) {
+                showToastMessage("Error: No bank account chosen for the expense!");
+                return false;
+            } else {
+                Expense newExpense = new Expense(activeAccount, expenseTitleText, category,
+                        expenseAmountText, trim(date), depositOrDeduction, isRecurring, recurrenceRate);
+
+                Timber.v(newExpense.toString());
+                new AsyncInsertExpense(getContext()).execute(newExpense);
+
+                if (!newExpense.getIsRecurring()) {
+                    new AsyncUpdateBalance(getContext()).execute(new UpdateAccountInfo(activeAccount, balanceChangeAmount));
+                } else {
+                    new AddRecurringExpensesTask((AppCompatActivity) activity).execute();
+                }
+
+                return true;
+            }
+        }
+        catch (Exception e) {
+            Timber.e(e, "Failed to add new expense.");
+            showToastMessage("Error in adding new expense!");
+            return false;
         }
     }
 

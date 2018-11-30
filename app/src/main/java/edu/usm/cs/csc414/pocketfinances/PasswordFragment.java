@@ -21,9 +21,9 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.util.Arrays;
 
-public class PasswordFragment extends Fragment implements View.OnClickListener {
+import timber.log.Timber;
 
-    private static final String TAG = "PasswordFragment";
+public class PasswordFragment extends Fragment implements View.OnClickListener {
 
     private CustomSharedPreferences sharedPrefs;
 
@@ -40,7 +40,7 @@ public class PasswordFragment extends Fragment implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(TAG, "Creating PasswordFragment.");
+        Timber.v("Attempting to create PasswordFragment.");
 
         View view = inflater.inflate(R.layout.fragment_password, container, false);
 
@@ -96,21 +96,12 @@ public class PasswordFragment extends Fragment implements View.OnClickListener {
 
         Activity parentActivity = getActivity();
 
-        // number of bytes of salt
-        final int numBytes = 20;
-
-        // number of hashing iterations.
-        final int iterations = 100;
-
         // get salt and password hash from shared prefs
         final byte[] salt = sharedPrefs.getSalt();
         final byte[] savedHash = sharedPrefs.getPinHash();
 
         try {
-            // hash user input password
-            PKCS5S2ParametersGenerator kdf = new PKCS5S2ParametersGenerator();
-            kdf.init(new String(pin).getBytes(), salt, iterations);
-            byte[] checkHash = ((KeyParameter) kdf.generateDerivedMacParameters(8 * numBytes)).getKey();
+            byte[] checkHash = HashingHandler.getHash(salt, new String(pin).getBytes());
 
             // check whether it matches saved password hash
             if (Arrays.equals(checkHash, savedHash)) {
@@ -135,7 +126,7 @@ public class PasswordFragment extends Fragment implements View.OnClickListener {
                 input3.setText("");
             }
         } catch (Exception e) {
-            Log.e(TAG, "Failed to authenticate password.", e);
+            Timber.e(e, "Failed to authenticate password.");
         }
     }
 
@@ -223,7 +214,6 @@ public class PasswordFragment extends Fragment implements View.OnClickListener {
     private void handleFingerprintButtonClicked() {
         if (sharedPrefs.getFingerprintEnabled()) {
             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-            //fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
             fragmentTransaction.replace(R.id.activity_password_framelayout, new FingerprintFragment())
                     .commit();
         }

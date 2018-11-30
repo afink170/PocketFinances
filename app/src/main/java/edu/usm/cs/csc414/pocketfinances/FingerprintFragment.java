@@ -36,13 +36,14 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
+import timber.log.Timber;
+
 import static android.content.Context.FINGERPRINT_SERVICE;
 import static android.content.Context.KEYGUARD_SERVICE;
 
 @SuppressWarnings("ALL")
 public class FingerprintFragment extends Fragment {
 
-    private static final String TAG = "FingerprintFragment";
     private static final String KEY_NAME = "fingerprint_auth_key";
 
     private CustomSharedPreferences sharedPrefs;
@@ -61,7 +62,8 @@ public class FingerprintFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(TAG, "Attempting to create FingerprintFragment.");
+        Timber.v("Attempting to create FingerprintFragment.");
+
 
         View view = inflater.inflate(R.layout.fragment_fingerprint, container, false);
 
@@ -83,8 +85,7 @@ public class FingerprintFragment extends Fragment {
 
             // Check if fingerprint scanner hardware is present on device
             if (!fingerprintManager.isHardwareDetected()) {
-                Log.e(TAG, "No fingerprint scanner detected!");
-                showToastMessage("No fingerprint scanner detected!");
+                Timber.e("No fingerprint scanner detected!");
                 exitToPasswordFragment();
                 return view;
             }
@@ -92,24 +93,21 @@ public class FingerprintFragment extends Fragment {
             // Check if access to fingerprint scanner has been granted for this app
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.USE_FINGERPRINT)
                     != PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG, "Fingerprint scanner access not granted!");
-                showToastMessage("Fingerprint scanner access not granted!");
+                Timber.e("Fingerprint scanner access not granted!");
                 exitToPasswordFragment();
                 return view;
             }
 
             // Check if user has any enrolled fingerprints
             if (!fingerprintManager.hasEnrolledFingerprints()) {
-                Log.e(TAG, "No enrolled fingerprints found!");
-                showToastMessage("No enrolled fingerprints found!");
+                Timber.e("No enrolled fingerprints found!");
                 exitToPasswordFragment();
                 return view;
             }
 
             // Check if the lock screen is secured
             if (!keyguardManager.isKeyguardSecure()) {
-                Log.e(TAG, "Lock screen is not secured!");
-                showToastMessage("Lock screen is not secured!");
+                Timber.e("Lock screen is not secured!");
                 exitToPasswordFragment();
                 return view;
             }
@@ -118,7 +116,7 @@ public class FingerprintFragment extends Fragment {
             try {
                 generateKey();
             } catch (Exception e) {
-                Log.e(TAG, "Failed to perform fingerprint authentication.", e);
+                Timber.e(e,"Failed to perform fingerprint authentication.");
             }
 
             if (initCipher()) {
@@ -200,7 +198,7 @@ public class FingerprintFragment extends Fragment {
                 | InvalidAlgorithmParameterException
                 | CertificateException
                 | IOException e) {
-            Log.e(TAG, "Failed to generate fingerprint authentication key.");
+            Timber.e(e, "Failed to generate fingerprint authentication key.");
             throw new FingerprintException(e);
         }
     }
@@ -215,7 +213,7 @@ public class FingerprintFragment extends Fragment {
                             + KeyProperties.BLOCK_MODE_CBC + "/"
                             + KeyProperties.ENCRYPTION_PADDING_PKCS7);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            Log.e(TAG, "Failed to get Cipher instance");
+            Timber.e(e, "Failed to get Cipher instance");
             throw new RuntimeException(e);
         }
 
@@ -229,7 +227,7 @@ public class FingerprintFragment extends Fragment {
             // Return true if the cipher has been initialized successfully
             return true;
         } catch (KeyPermanentlyInvalidatedException e) {
-            Log.e(TAG, "Cipher initialization failed!");
+            Timber.e(e, "Cipher initialization failed!");
             // Return false if cipher initialization failed
             return false;
         } catch (KeyStoreException
@@ -238,7 +236,7 @@ public class FingerprintFragment extends Fragment {
                 | IOException
                 | NoSuchAlgorithmException
                 | InvalidKeyException e) {
-            Log.e(TAG, "Cipher initialization failed!");
+            Timber.e(e, "Cipher initialization failed!");
             throw new RuntimeException(e);
         }
     }

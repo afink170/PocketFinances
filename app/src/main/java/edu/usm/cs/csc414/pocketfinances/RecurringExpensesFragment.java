@@ -20,15 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
+import timber.log.Timber;
 
 public class RecurringExpensesFragment extends Fragment {
-
-
-
-    private static final String TAG = "RecurringExpensesFrag";
-
-    // Declare Typeface for custom font
-    //Typeface FONT_WALKWAY;
 
     // Declare UI elements
     ImageButton addRecurringExpenseBtn;
@@ -42,7 +36,7 @@ public class RecurringExpensesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(TAG, "Attempting to create RecurringExpensesFragment.");
+        Timber.v("Attempting to create RecurringExpensesFragment.");
 
         View view = inflater.inflate(R.layout.fragment_recurring_expenses, container, false);
 
@@ -68,81 +62,70 @@ public class RecurringExpensesFragment extends Fragment {
         recyclerView.setAdapter(sectionAdapter);
 
 
-        addRecurringExpenseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                NewExpenseDialog newExpenseDialog = new NewExpenseDialog(getActivity(), true);
-                newExpenseDialog.show();
-            }
+        addRecurringExpenseBtn.setOnClickListener(view1 -> {
+            NewExpenseDialog newExpenseDialog = new NewExpenseDialog(getActivity(), true);
+            newExpenseDialog.show();
         });
 
 
         // Set the ViewModel to observe the live Expense data list
         //      so that the UI will update whenever the data or config changes
-        viewModel.getExpensesList().observe(getActivity(), new Observer<List<Expense>>() {
-            @Override
-            public void onChanged(@Nullable List<Expense> expenseList) {
-                Log.d(TAG, "Recurring expenses received.  Populating RecyclerView.");
+        viewModel.getExpensesList().observe(getActivity(), expenseList -> {
+            Timber.d("Recurring expenses received.  Populating RecyclerView.");
 
-                sectionAdapter.removeAllSections();
+            sectionAdapter.removeAllSections();
 
-                // There are 8 different recurrence rates, but the first one is "Once," or no recurrence.
-                // So we will start at 1, and iterate through looking for expense matching the recurrence rate.
-                // Basically, we are sorting them into sections by recurrence rate
-                for (int i = 1; i < 8; i++) {
+            // There are 8 different recurrence rates, but the first one is "Once," or no recurrence.
+            // So we will start at 1, and iterate through looking for expense matching the recurrence rate.
+            // Basically, we are sorting them into sections by recurrence rate
+            for (int i = 1; i < 8; i++) {
 
-                    RecurrenceRate rate = RecurrenceRate.getRateFromValue(i);
+                RecurrenceRate rate = RecurrenceRate.getRateFromValue(i);
 
-                    ArrayList<Expense> expenses = new ArrayList<>();
+                ArrayList<Expense> expenses = new ArrayList<>();
 
-                    for (Expense expense : expenseList) {
-                        //Log.v(TAG, expense.toString());
-                        if (expense.getRecurrenceRate().getValue().equals(rate.getValue()))
-                            expenses.add(expense);
+                for (Expense expense : expenseList) {
+                    //Log.v(TAG, expense.toString());
+                    if (expense.getRecurrenceRate().getValue().equals(rate.getValue()))
+                        expenses.add(expense);
+                }
+
+                if (expenses.isEmpty()) continue;
+
+                //Log.v(TAG, "Section: " + rate.getText() + "   Expenses: \r\n" + expenses);
+                RecurringExpensesRecyclerViewSection section = new RecurringExpensesRecyclerViewSection(rate.getText(),expenses, getContext());
+
+                section.setOnLongClickListener(view12 -> {
+                    //int itemPosition = recyclerView.getChildLayoutPosition(view);
+
+                    try {
+                        TextView expenseIdTextView = view12.findViewById(R.id.recurring_expenses_recyclerview_textview_expenseid);
+
+                        int expenseId = Integer.valueOf(expenseIdTextView.getText().toString());
+
+                        Expense clickedExpense = null;
+                        for (Expense expense : viewModel.getExpensesList().getValue()) {
+                            if (expense.getExpenseId() == expenseId) {
+                                clickedExpense = expense;
+                                break;
+                            }
+                        }
+
+                        if (clickedExpense != null) {
+                            EditDeleteExpenseDialog editDeleteExpenseDialog = new EditDeleteExpenseDialog(getActivity(), viewModel, clickedExpense);
+                            editDeleteExpenseDialog.show();
+                        }
+                        else
+                            throw new Exception("clickedExpense is null!");
+                    } catch(Exception e) {
+                        Timber.e(e, "ERROR: Failed to find position of clicked expense!");
                     }
 
-                    if (expenses.isEmpty()) continue;
+                    return true;
+                });
 
-                    //Log.v(TAG, "Section: " + rate.getText() + "   Expenses: \r\n" + expenses);
-                    RecurringExpensesRecyclerViewSection section = new RecurringExpensesRecyclerViewSection(rate.getText(),expenses, getContext());
-
-                    section.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View view) {
-                            //int itemPosition = recyclerView.getChildLayoutPosition(view);
-
-                            try {
-                                TextView expenseIdTextView = view.findViewById(R.id.recurring_expenses_recyclerview_textview_expenseid);
-
-                                int expenseId = Integer.valueOf(expenseIdTextView.getText().toString());
-
-                                Expense clickedExpense = null;
-                                for (Expense expense : viewModel.getExpensesList().getValue()) {
-                                    if (expense.getExpenseId() == expenseId) {
-                                        clickedExpense = expense;
-                                        break;
-                                    }
-                                }
-
-                                if (clickedExpense != null) {
-                                    EditDeleteExpenseDialog editDeleteExpenseDialog = new EditDeleteExpenseDialog(getActivity(), viewModel, clickedExpense);
-                                    editDeleteExpenseDialog.show();
-                                }
-                                else
-                                    throw new Exception("clickedExpense is null!");
-                            } catch(Exception e) {
-                                String message = "ERROR: Failed to find position of clicked expense!";
-                                Log.e(TAG, message, e);
-                                //showToastMessage(message);
-                            }
-
-                            return true;
-                        }
-                    });
-
-                    sectionAdapter.addSection(section);
-                    recyclerView.setAdapter(sectionAdapter);
-                }
+                sectionAdapter.addSection(section);
+                recyclerView.setAdapter(sectionAdapter);
             }
         });
 

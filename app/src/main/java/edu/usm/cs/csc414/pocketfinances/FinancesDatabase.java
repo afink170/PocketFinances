@@ -13,13 +13,13 @@ import com.commonsware.cwac.saferoom.SafeHelperFactory;
 
 import java.io.File;
 
+import timber.log.Timber;
+
 
 @Database(entities = { BankAccount.class, Expense.class },
         version = 3,
         exportSchema = true)
 public abstract class FinancesDatabase extends RoomDatabase {
-
-    private static final String TAG = "FinancesDatabase";
 
     public abstract BankAccountDao getBankAccountDao();
     public abstract ExpenseDao getExpenseDao();
@@ -40,7 +40,7 @@ public abstract class FinancesDatabase extends RoomDatabase {
                                 .build();
             }
         } catch(Exception e) {
-            Log.e(TAG, "Failed to get database instance!", e);
+            Timber.e(e, "Failed to get database instance!");
         }
 
         return INSTANCE;
@@ -53,16 +53,6 @@ public abstract class FinancesDatabase extends RoomDatabase {
             System.out.println("Database deleted");
         else
             System.out.println("Failed to delete database");
-
-        /*
-        File journal = new File(databases, databaseName + "-journal");
-        if (journal.exists()) {
-            if (journal.delete())
-                System.out.println("Database journal deleted");
-            else
-                System.out.println("Failed to delete database journal");
-        }
-        */
     }
 
 

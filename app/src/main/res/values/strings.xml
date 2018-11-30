@@ -19,4 +19,17 @@
     <string name="fragment_welcome_4_security_text">Next, you can choose a 4-digit PIN to protect your finance data. If enabled, you will be prompted to enter your PIN whenever you launch the app. This feature is not required but is highly recommended for your security.</string>
     <string name="fragment_welcome_5_done_text">You\'re all set! Enjoy using the app, and if you have any questions, feel free to check the FAQ\'s in the preferences page.</string>
     <string name="fingerprint_fragment_add_text">By enabling fingerprint authentication, any fingerprint that is enrolled in the device will be able to unlock and open the app.</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="background">Background</string>
+
+    <!-- Settings Strings -->
+
+    <string name="about_settings">About</string>
+    <string name="change_background">Change Background</string>
+    <string name="notifications">Notifications</string>
+    <string name="fingerprintScanner">Fingerprint</string>
+    <string name="change_password">Password</string>
+    <string name="change_default">Default Account</string>
+    <string name="licensing">Licensing</string>
+
 </resources>

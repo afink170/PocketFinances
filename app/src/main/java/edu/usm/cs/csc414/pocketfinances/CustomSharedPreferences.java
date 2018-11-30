@@ -3,11 +3,12 @@ package edu.usm.cs.csc414.pocketfinances;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
-import android.util.Log;
 
 import com.thz.keystorehelper.KeyStoreManager;
 
 import java.util.Arrays;
+
+import timber.log.Timber;
 
 
 /**
@@ -17,9 +18,8 @@ import java.util.Arrays;
  */
 public class CustomSharedPreferences {
 
-    private static final String TAG = "CustomSharedPrefs";
-
     private static final String SHARED_PREFS = "shared_prefs";
+
     private static final String PREFS_VERSION_CODE = "version_code";
     private static final String PREFS_DEFAULT_ACCOUNT = "default_account";
     private static final String PREFS_DEFAULT_IS_ALL_ACCOUNTS = "default_is_all";
@@ -31,6 +31,10 @@ public class CustomSharedPreferences {
     private static final String PREFS_ENCRYPT_KEY = "encrypt_key";
     private static final String PREFS_FINGERPRINT_ENABLED = "fingerprint_enabled";
     private static final String PREFS_ACTIVITY_BACKGROUND = "activity_background";
+    private static final String PREFS_ACTIVITY_THEME = "activity_theme";
+
+    public static final int THEME_DARK = 1;
+    public static final int THEME_LIGHT = 0;
 
     private static final String KEYSTORE_ENCRYPT_ALIAS = "encrypt_alias";
 
@@ -293,7 +297,7 @@ public class CustomSharedPreferences {
             sharedPrefs.edit().putString(PREFS_ENCRYPT_KEY, encryptedKey).apply();
         }
         else {
-            Log.d(TAG, "Encryption key already generated.  No action performed.");
+            Timber.d("Encryption key already generated.  No action performed.");
         }
     }
 
@@ -331,21 +335,53 @@ public class CustomSharedPreferences {
 
 
     /**
-     * Gets the resource ID of the chosen background for the app.
+     * Gets the chosen background for the app.
      *
-     * @return Integer ID of the background.
+     * @return the object referring to the chosen background.
      */
-    public int getActivityBackground() {
-        return sharedPrefs.getInt(PREFS_ACTIVITY_BACKGROUND, R.drawable.background_dark);
+    public Background getActivityBackground() {
+        int backgroundId = sharedPrefs.getInt(PREFS_ACTIVITY_BACKGROUND, Background.DARK_GREY.getResourceId());
+
+        if (backgroundId == Background.LIGHT_BLUE.getResourceId())
+            setActivityTheme(THEME_LIGHT);
+        else
+            setActivityTheme(THEME_DARK);
+
+        return  Background.getById(backgroundId);
     }
 
 
     /**
      * Stores the resource ID of the chosen background for the app in shared preferences.
      *
-     * @param resource Integer ID of the background.
+     * @param background The chosen background object.
      */
-    public void setActivityBackground(int resource) {
-        sharedPrefs.edit().putInt(PREFS_ACTIVITY_BACKGROUND, resource).apply();
+    public void setActivityBackground(Background background) {
+        sharedPrefs.edit().putInt(PREFS_ACTIVITY_BACKGROUND, background.getResourceId()).apply();
+
+        if (background == Background.LIGHT_BLUE)
+            setActivityTheme(THEME_LIGHT);
+        else
+            setActivityTheme(THEME_DARK);
+    }
+
+
+    /**
+     * Gets the chosen theme of the app, either dark or light.
+     *
+     * @return 1 for dark, 0 for light.
+     */
+    public int getActivityTheme() {
+        return sharedPrefs.getInt(PREFS_ACTIVITY_THEME, THEME_DARK);
+    }
+
+
+    /**
+     * Stores the integer value of the chosen theme for the app in shared preferences.
+     *
+     * @param theme 1 for dark, 0 for light.
+     */
+    public void setActivityTheme(int theme) {
+        sharedPrefs.edit().putInt(PREFS_ACTIVITY_THEME, theme).apply();
     }
 }

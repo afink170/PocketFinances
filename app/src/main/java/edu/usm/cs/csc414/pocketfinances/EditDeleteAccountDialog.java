@@ -136,43 +136,37 @@ public class EditDeleteAccountDialog extends Dialog implements View.OnClickListe
         editDialog.setCancelable(true);
         editDialog.setView(alertDialogView);
 
-        editDialog.setPositiveButton("Save", new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        editDialog.setPositiveButton("Save", (dialogInterface, i) -> {
 
-                String accountNameText = accountName.getText().toString();
-                String bankNameText = bankName.getText().toString();
-                String accountTypeText = accountType.getText().toString();
+            String accountNameText = accountName.getText().toString();
+            String bankNameText = bankName.getText().toString();
+            String accountTypeText = accountType.getText().toString();
 
-                boolean flag = false;
+            boolean flag = false;
 
-                if (!accountNameText.equals(account.getAccountName())) {
-                    account.setAccountName(accountNameText);
-                    flag = true;
-                }
-                if (!bankNameText.equals(account.getBankName())) {
-                    account.setBankName(bankNameText);
-                    flag = true;
-                }
-                if (!accountTypeText.equals(account.getAccountType())) {
-                    account.setAccountType(accountTypeText);
-                    flag = true;
-                }
-
-                if (flag)
-                    viewModel.updateItem(account);
-
-                showToastMessage("Account updated!");
-                dialogInterface.dismiss();
+            if (!accountNameText.equals(account.getAccountName())) {
+                account.setAccountName(accountNameText);
+                flag = true;
             }
+            if (!bankNameText.equals(account.getBankName())) {
+                account.setBankName(bankNameText);
+                flag = true;
+            }
+            if (!accountTypeText.equals(account.getAccountType())) {
+                account.setAccountType(accountTypeText);
+                flag = true;
+            }
+
+            if (flag)
+                viewModel.updateItem(account);
+
+            showToastMessage("Account updated!");
+            dialogInterface.dismiss();
         });
 
-        editDialog.setNegativeButton("Cancel", new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //showToastMessage("Edit account cancelled!");
-                dialogInterface.dismiss();
-            }
+        editDialog.setNegativeButton("Cancel", (dialogInterface, i) -> {
+            //showToastMessage("Edit account cancelled!");
+            dialogInterface.dismiss();
         });
         editDialog.show();
     }

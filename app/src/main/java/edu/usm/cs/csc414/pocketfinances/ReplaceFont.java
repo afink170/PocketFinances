@@ -6,6 +6,8 @@ import android.util.Log;
 
 import java.lang.reflect.Field;
 
+import timber.log.Timber;
+
 public class ReplaceFont {
 
     public static void replaceDefaultFont(Context context,
@@ -23,7 +25,7 @@ public class ReplaceFont {
             field.setAccessible(true);
             field.set(null, font);
         } catch (Exception e) {
-            Log.e("ReplaceFont", "Failed to set font globally.", e);
+            Timber.e(e, "Failed to set font globally.");
         }
     }
 }

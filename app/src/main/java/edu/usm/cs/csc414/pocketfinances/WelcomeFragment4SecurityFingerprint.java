@@ -16,8 +16,6 @@ import android.widget.Switch;
 
 @SuppressWarnings("deprecation")
 public class WelcomeFragment4SecurityFingerprint extends Fragment {
-
-    private static final String TAG = "WelcomeFingerprint";
     private static final int REQUEST_USE_FINGERPRINT_CODE = 0;
 
     private Switch enableFingerprintSwitch;
@@ -35,22 +33,19 @@ public class WelcomeFragment4SecurityFingerprint extends Fragment {
 
         enableFingerprintSwitch.setChecked(false);
 
-        enableFingerprintSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        enableFingerprintSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
 
-                if (!b) {
-                    sharedPrefs.setFingerprintEnabled(false);
-                    return;
-                }
-
-                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.USE_FINGERPRINT)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.USE_FINGERPRINT}, REQUEST_USE_FINGERPRINT_CODE);
-                }
-                else
-                    sharedPrefs.setFingerprintEnabled(true);
+            if (!b) {
+                sharedPrefs.setFingerprintEnabled(false);
+                return;
             }
+
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.USE_FINGERPRINT)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.USE_FINGERPRINT}, REQUEST_USE_FINGERPRINT_CODE);
+            }
+            else
+                sharedPrefs.setFingerprintEnabled(true);
         });
 
         return view;

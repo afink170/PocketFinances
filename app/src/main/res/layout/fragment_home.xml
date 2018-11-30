@@ -10,14 +10,14 @@
         android:id="@+id/fragment_home_settings_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_settings"
+        android:src="@drawable/ic_settings_light"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:background="?android:selectableItemBackgroundBorderless"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:contentDescription="Settings" />
+        android:contentDescription="@string/title_activity_settings" />
 
     <TextView
         android:id="@+id/fragment_home_title_textview"
@@ -112,7 +112,6 @@
                     android:layout_height="50dp"
                     android:layout_marginBottom="20dp"
                     android:text="$0.00"
-                    android:textColor="@color/colorWhite"
                     android:textSize="20sp"
                     android:gravity="center_vertical"
                     app:layout_constraintRight_toRightOf="parent"
@@ -138,7 +137,7 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:text="Remaining Budget"
+                    android:text="Monthly Expenses"
                     android:textSize="16sp"/>
 
                 <TextView
@@ -147,7 +146,6 @@
                     android:layout_height="50dp"
                     android:layout_marginBottom="20dp"
                     android:text="$0.00"
-                    android:textColor="@color/colorWhite"
                     android:textSize="20sp"
                     android:gravity="center_vertical"
                     app:layout_constraintRight_toRightOf="parent"
@@ -175,10 +173,12 @@
 
         <ImageButton
             android:id="@+id/fragment_home_addexpense_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_marginTop="20dp"
-            android:src="@mipmap/ic_add_100"
+            android:layout_marginBottom="4dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_add_light"
             android:background="?android:selectableItemBackgroundBorderless"
             android:layout_gravity="center"
             android:contentDescription="Add New Expense" />

@@ -10,9 +10,9 @@ import android.util.Log;
 import java.util.Calendar;
 import java.util.List;
 
-public class ExpensesViewModel extends AndroidViewModel {
+import timber.log.Timber;
 
-    private final String TAG = getClass().getSimpleName();
+public class ExpensesViewModel extends AndroidViewModel {
 
     private final LiveData<List<Expense>> expensesList;
 
@@ -36,20 +36,20 @@ public class ExpensesViewModel extends AndroidViewModel {
 
             if (currentTime != null) {
                 if (before != null && before) {
-                    Log.v(TAG, "Querying the database for parent recurring expenses with nextOcurrence before current time.");
+                    Timber.v("Querying the database for parent recurring expenses with nextOcurrence before current time.");
                     expensesList = financesDatabase.getExpenseDao().getAllRecurringExpensesBeforeDate(currentTime.getTimeInMillis());
                 } else {
-                    Log.v(TAG, "Querying the database for parent recurring expenses with nextOcurrence after current time.");
+                    Timber.v("Querying the database for parent recurring expenses with nextOcurrence after current time.");
                     expensesList = financesDatabase.getExpenseDao().getAllRecurringExpensesAfterDate(currentTime.getTimeInMillis());
                 }
             }
             else {
-                Log.v(TAG, "Querying the database for parent recurring expenses.");
+                Timber.v("Querying the database for parent recurring expenses.");
                 expensesList = financesDatabase.getExpenseDao().getAllRecurringExpenses();
             }
         }
         else {
-            Log.v(TAG, "Querying the database for all expenses.");
+            Timber.v("Querying the database for all expenses.");
             expensesList = financesDatabase.getExpenseDao().getAllExpenses();
         }
     }
@@ -70,19 +70,19 @@ public class ExpensesViewModel extends AndroidViewModel {
         financesDatabase = FinancesDatabase.getDatabase(this.getApplication());
 
         if (category == null && accountId != null) {
-            Log.v(TAG, "Querying the database for all expenses with accountId="+accountId+".");
+            Timber.v("Querying the database for all expenses with accountId="+accountId+".");
             expensesList = financesDatabase.getExpenseDao().getExpensesOnAccount(accountId);
         }
         else if (accountId == null && category != null) {
-            Log.v(TAG, "Querying the database for all expenses with category="+category.getText()+".");
+            Timber.v("Querying the database for all expenses with category="+category.getText()+".");
             expensesList = financesDatabase.getExpenseDao().getExpensesOnCategoryValue(category.getValue());
         }
         else if (accountId != null) {
-            Log.v(TAG, "Querying the database for all expenses with category="+category.getText()+" and accountId="+accountId+".");
+            Timber.v("Querying the database for all expenses with category="+category.getText()+" and accountId="+accountId+".");
             expensesList = financesDatabase.getExpenseDao().getExpensesOnCategoryAndAccount(category.getValue(), accountId);
         }
         else {
-            Log.v(TAG, "Querying the database for all expenses.");
+            Timber.v("Querying the database for all expenses.");
             expensesList = financesDatabase.getExpenseDao().getAllExpenses();
         }
     }
