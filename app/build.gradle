@@ -18,8 +18,8 @@ android {
         applicationId "edu.usm.cs.csc414.pocketfinances"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 181117  // version code should be the date that it was updated, in yymmdd format
-        versionName "0.1"
+        versionCode 181130  // version code should be the date that it was updated, in yymmdd format
+        versionName "0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
