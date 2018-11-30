@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         // Build the ad request
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("823BB7D8CD78C731A6E45BE9549A0C87")
                 .build();
 
         // Load ads into the adView
@@ -135,22 +136,11 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.nav_budget:
                     if (R.id.nav_budget != activeFragmentId) {
-
                         fragmentTransaction.setCustomAnimations(R.animator.slide_left_right_in, R.animator.slide_left_right_out);
-
-                        /*
                         fragmentTransaction
                                 .replace(fragmentHolder.getId(), new BudgetFragment(), "BudgetFragment")
                                 .addToBackStack(null)
                                 .commit();
-
-                        */
-
-                        fragmentTransaction
-                                .replace(fragmentHolder.getId(), new ViewPagerTestFragment(), "ViewPagerTestFragment")
-                                .addToBackStack(null)
-                                .commit();
-
                         activeFragmentId = R.id.nav_budget;
 
                     }

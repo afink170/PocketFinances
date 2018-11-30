@@ -3,7 +3,6 @@ package edu.usm.cs.csc414.pocketfinances;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
-import android.util.Log;
 
 import com.thz.keystorehelper.KeyStoreManager;
 
